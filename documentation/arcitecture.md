@@ -41,7 +41,7 @@ FoodDiary представляет собой Web приложение, вклю
 - **Frontend**: работа с API, кэширование данных в `localStorage` или `IndexedDB`.
 
 ### 6. Структурная схема приложения
-![Архитектурная диаграмма ToBe](https://github.com/nstprkp/FoodDiary/blob/d6271b4d3769b756011e8f8d3b0407a267ed8ae2/documentation/pictures/architecture_to_be.png)
+![Архитектурная диаграмма ToBe](https://github.com/nstprkp/FoodDiary/blob/d6271b4d3769b756011e8f8d3b0407a267ed8ae2/documentation/pictures/architectureToBe.png)
 
 ## Часть 2. Анализ архитектуры («As Is»)
 
@@ -59,7 +59,7 @@ FoodDiary представляет собой Web приложение, вклю
   - **core/** – конфигурации.
 - **Frontend**:
 
-![Архитектурная диаграмма AsIs](https://github.com/nstprkp/FoodDiary/blob/d6271b4d3769b756011e8f8d3b0407a267ed8ae2/documentation/pictures/architecture_as_is.png)
+![Архитектурная диаграмма AsIs](https://github.com/nstprkp/FoodDiary/blob/d6271b4d3769b756011e8f8d3b0407a267ed8ae2/documentation/pictures/architectureAsIs.png)
 
 
 ## Часть 3. Сравнение и рефакторинг
