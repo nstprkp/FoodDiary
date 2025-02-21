@@ -5,7 +5,6 @@ from src.cache.cache import cache
 from src.core.security import verify_password, get_password_hash
 from src.logging_config import logger
 from src.models.user import User
-from src.rabbitmq.producer import publish_message
 from src.schemas.user import *
 from src.services.user_service import find_user_by_login_and_email
 
@@ -70,7 +69,6 @@ async def create_user(db: AsyncSession, user: UserCreate):
             "email": new_user.email,
             "login": new_user.login,
         }
-        await publish_message(message_data, "registration_queue")
 
         logger.info(f"User created successfully: {new_user.login}")
         return UserRead.model_validate(new_user)

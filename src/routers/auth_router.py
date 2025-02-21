@@ -9,7 +9,6 @@ from src.core.security import create_access_token, get_current_user
 from src.database.database import get_async_session
 from src.logging_config import logger
 from src.models.user import User
-from src.rabbitmq.consumer import consume_messages
 from src.schemas.user import UserCreate
 from src.services.auth_service import create_user, authenticate_user, validate_token_logic
 import urllib.parse
@@ -114,7 +113,6 @@ async def registration(user: UserCreate, db: AsyncSession = Depends(get_async_se
     access_token = create_access_token(data={"sub": new_user.login})
     await db.commit()
     await db.refresh(new_user)
-    await consume_messages("registration_queue")
     logger.info(f"Пользователь {user.email} успешно зарегистрирован")
     return {"access_token": access_token, "token_type": "bearer"}
 
