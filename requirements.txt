@@ -1,0 +1,14 @@
+fastapi
+sqlalchemy
+uvicorn
+psycopg2-binary
+alembic
+python-dotenv
+passlib
+redis
+aio-pika
+asyncpg
+jwt
+PyJWT==1.7.1
+httpx
+pylint
