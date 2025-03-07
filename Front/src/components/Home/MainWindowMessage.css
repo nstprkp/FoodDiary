@@ -1,0 +1,24 @@
+.main-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Центрируем контент */
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    min-height: 80vh; /* Растягиваем фон на весь экран */
+    margin-top: 0px;
+    background-color: #7d02f8;
+}
+
+
+.h1 {
+    font-size: 100px;
+    color: #f5f4f2df;
+    text-align: center;
+}
+
+.p {
+    font-size: 30px;
+    color: #f5f4f2df;
+    text-align: center;
+}
