@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import "./Registration.css";
-import { Link } from "react-router-dom"; // Импортируем Link для навигации
+import "./Login.css";
+import { Link } from "react-router-dom";  // Импортируем Link для навигации
 
-export default function Registration() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+export default function Login() {
+  const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -14,53 +13,51 @@ export default function Registration() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    const userData = {
-      login: username,
-      email: email,
+  
+    const userData = new URLSearchParams({
+      email_login: login,  // Используем правильный параметр
       password: password,
-    };
-
+    });
+  
     try {
-      const response = await fetch("http://localhost:8000/auth/registration", {
+      const response = await fetch(`http://localhost:8000/auth/login?${userData.toString()}`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded", // Убедитесь, что это указано, когда отправляете данные как query string
         },
-        body: JSON.stringify(userData),
       });
-
+  
       if (!response.ok) {
-        throw new Error("Ошибка при регистрации. Попробуйте снова.");
+        throw new Error("Ошибка при авторизации. Проверьте данные и попробуйте снова.");
       }
-
+  
       const data = await response.json();
       localStorage.setItem("access_token", data.access_token);
-
-      navigate("/login"); // Перенаправление после успешной регистрации
+  
+      navigate("/profile"); // Перенаправление после успешного входа
     } catch (err) {
       setError(err.message);
     }
-  };
+  };  
 
   return (
-    <motion.div
-      className="registration-container"
+    <motion.div 
+      className="login-container"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
     >
-      <motion.h1
-        className="registration-title"
+      <motion.h1 
+        className="login-title"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.3 }}
       >
-        Создайте аккаунт
+        Входите в аккаунт
       </motion.h1>
 
       {error && (
-        <motion.p
+        <motion.p 
           className="error-message"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -70,8 +67,8 @@ export default function Registration() {
         </motion.p>
       )}
 
-      <motion.form
-        className="registration-form"
+      <motion.form 
+        className="login-form"
         onSubmit={handleSubmit}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -80,24 +77,13 @@ export default function Registration() {
         <motion.input
           type="text"
           placeholder="Логин"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={login}
+          onChange={(e) => setLogin(e.target.value)}
           className="input-field"
           required
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.9 }}
-        />
-        <motion.input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="input-field"
-          required
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.1 }}
         />
         <motion.input
           type="password"
@@ -108,28 +94,28 @@ export default function Registration() {
           required
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.3 }}
+          transition={{ duration: 1, delay: 1.1 }}
         />
         <motion.button
           type="submit"
-          className="registration-btn"
+          className="auth-btn"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.5 }}
+          transition={{ duration: 1, delay: 1.3 }}
         >
-          Регистрация
+          Войти
         </motion.button>
       </motion.form>
 
-      {/* Ссылка "Войти" с анимацией */}
+      {/* Кнопка для перехода на страницу регистрации */}
       <motion.div
-        className="to-login-btn-container"
+        className="to-registration-btn-container"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.7 }}
+        transition={{ duration: 1, delay: 1.5 }}
       >
-        <Link to="/login" className="to-login-btn">
-          Войти
+        <Link to="/registration" className="to-registration-btn">
+          Создать аккаунт
         </Link>
       </motion.div>
 
@@ -138,7 +124,7 @@ export default function Registration() {
         className="home-btn-container"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.9 }}
+        transition={{ duration: 1, delay: 1.7 }}
       >
         <Link to="/" className="home-btn">
           На главную

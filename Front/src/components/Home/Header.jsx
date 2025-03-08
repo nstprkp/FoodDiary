@@ -15,7 +15,7 @@ export default function Header() {
         transition={{ duration: 1, ease: "easeOut" }}
       >
         <button className="login-btn" onClick={() => navigate("/login")}>Войти</button>
-        <button className="register-btn" onClick={() => navigate("/register")}>Регистрация</button>
+        <button className="register-btn" onClick={() => navigate("/registration")}>Регистрация</button>
       </motion.div>
     </header>
   );
