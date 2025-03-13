@@ -15,16 +15,17 @@ export default function Login() {
     setError("");
   
     const userData = new URLSearchParams({
-      email_login: login,  // Используем правильный параметр
+      username: login,  // Используем 'username', а не 'email_login'
       password: password,
     });
   
     try {
-      const response = await fetch(`http://localhost:8000/auth/login?${userData.toString()}`, {
+      const response = await fetch("http://localhost:8000/auth/login", {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded", // Убедитесь, что это указано, когда отправляете данные как query string
+          "Content-Type": "application/x-www-form-urlencoded", // Убедитесь, что это указано для 'application/x-www-form-urlencoded'
         },
+        body: userData.toString()  // Передаем данные в теле запроса
       });
   
       if (!response.ok) {

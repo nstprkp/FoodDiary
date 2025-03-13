@@ -1,45 +1,43 @@
 import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
-
 from fastapi import HTTPException
-
 from src.models.user import User
 from src.schemas.user import UserRead, UserUpdate
 from src.schemas.user_weight import UserWeightUpdate
 from src.services.user_service import find_user_by_login_and_email, delete_user, update_user
 
-
 @pytest.mark.asyncio
 async def test_find_user_by_login_and_email_cache_hit():
     mock_cache = AsyncMock()
     mock_db = AsyncMock()
-    email_login = "test_user"
+    login = "test_user"
+    email = None
 
     # Данные, которые вернутся из кэша
-    cached_user = {"id": 1, "login": email_login, "email": "test@example.com"}
+    cached_user = {"id": 1, "login": login, "email": "test@example.com"}
     mock_cache.get.return_value = cached_user
 
     with patch("src.services.user_service.cache", mock_cache):
-        user = await find_user_by_login_and_email(mock_db, email_login)
+        user = await find_user_by_login_and_email(mock_db, login)
 
         expected_user = UserRead.model_validate(cached_user)
 
         # Проверяем, что данные из кэша возвращаются корректно
         assert user == expected_user
-        mock_cache.get.assert_called_once_with(f"user:{email_login}")
+        mock_cache.get.assert_called_once_with(f"user:{login}")
         mock_db.execute.assert_not_called()  # База данных не должна вызываться
-
 
 @pytest.mark.asyncio
 async def test_find_user_by_login_and_email_cache_miss():
     mock_cache = AsyncMock()
     mock_db = AsyncMock()
-    email_login = "test_user"
+    login = "test_user"
+    email = None
 
     mock_cache.get.return_value = None  # Нет данных в кэше
 
     # Пользователь из БД
-    user_from_db = User(id=1, login=email_login, email="test@example.com")
+    user_from_db = User(id=1, login=login, email="test@example.com")
 
     # Правильный мок SQLAlchemy execute() -> scalar_one_or_none()
     mock_result = AsyncMock()
@@ -48,20 +46,19 @@ async def test_find_user_by_login_and_email_cache_miss():
     mock_db.execute.return_value = mock_result  # execute() вернёт mock_result
 
     with patch("src.services.user_service.cache", mock_cache):
-        user = await find_user_by_login_and_email(mock_db, email_login)
+        user = await find_user_by_login_and_email(mock_db, login)
 
         assert user.id == user_from_db.id
         assert user.login == user_from_db.login
         assert user.email == user_from_db.email
 
-        mock_cache.get.assert_called_once_with(f"user:{email_login}")
+        mock_cache.get.assert_called_once_with(f"user:{login}")
 
         mock_cache.set.assert_called_once_with(
-            f"user:{email_login}",
+            f"user:{login}",
             UserRead.model_validate(user_from_db).model_dump(mode="json"),
             expire=3600,
         )
-
 
 @pytest.mark.asyncio
 async def test_delete_user():
@@ -91,7 +88,6 @@ async def test_delete_user():
         # Проверяем, что возвращается сам пользователь
         assert deleted_user == expected_user
 
-
 @pytest.mark.asyncio
 async def test_update_user():
     # Моки для кэша и базы данных
@@ -112,7 +108,6 @@ async def test_update_user():
         gender="male",
         aim="maintain",
         recommended_calories=2500,
-        profile_image="old_image.jpg"
     )
 
     # Данные для обновления
@@ -125,7 +120,6 @@ async def test_update_user():
         gender="female",
         aim="lose",
         recommended_calories=2300,
-        profile_image="new_image.jpg"
     )
 
     # Мокируем запрос и результат
@@ -156,7 +150,6 @@ async def test_update_user():
             assert updated_user.gender == "female"
             assert updated_user.aim == "lose"
             assert updated_user.recommended_calories == 2300
-            assert updated_user.profile_image == "new_image.jpg"
 
             # Проверяем, что был вызван commit
             mock_db.commit.assert_called_once()
