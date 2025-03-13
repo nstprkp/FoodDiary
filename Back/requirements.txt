@@ -6,9 +6,12 @@ alembic
 python-dotenv
 passlib
 redis
-aio-pika
-asyncpg
+httpx
 jwt
 PyJWT==1.7.1
-httpx
-pylint
+asyncpg
+greenlet
+aio-pika
+aiosmtplib
+jinja2
+python-multipart

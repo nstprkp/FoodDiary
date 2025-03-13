@@ -4,32 +4,34 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.cache.cache import cache
 from src.logging_config import logger
 from src.models.user import User
-from src.schemas.user import UserUpdate, UserRead
+from src.schemas.user import UserUpdate, UserRead, UserCalculateNutrients
 from src.schemas.user_weight import UserWeightUpdate
 from src.services.user_weight_service import save_or_update_weight
 
-
 async def find_user_by_login_and_email(db: AsyncSession, email_login: str):
     cache_key = f"user:{email_login}"
-    cached_user = await cache.get(cache_key)
+    try:
+        # Проверяем наличие пользователя в кэше
+        cached_user = await cache.get(cache_key)
+        if cached_user:
+            logger.info(f"Cache hit for user: {email_login}")
+            return UserRead.model_validate(cached_user)
 
-    if cached_user:
-        logger.info(f"Cache hit for user: {email_login}")
-        return UserRead.model_validate(cached_user)
+        # Если в кэше нет, делаем запрос в БД
+        logger.info(f"Cache miss for user: {email_login}. Fetching from database.")
+        query = select(User).where(or_(User.login == email_login, User.email == email_login))
+        result = await db.execute(query)
+        user = result.scalar_one_or_none()
 
-    logger.info(f"Cache miss for user: {email_login}. Fetching from database.")
-    query = select(User).where(or_(User.login == email_login, User.email == email_login))
-    result = await db.execute(query)  # Вернёт mock_result
-    user = result.scalar_one_or_none()  # Вызываем scalar_one_or_none()
+        if user:
+            user_pydantic = UserRead.model_validate(user)
+            await cache.set(cache_key, user_pydantic.model_dump(mode="json"), expire=3600)
+            return user_pydantic
 
-    if user:
-        # Сериализация пользователя в JSON-совместимый формат для кэша
-        user_pydantic = UserRead.model_validate(user)
-        await cache.set(cache_key, user_pydantic.model_dump(mode="json"), expire=3600)
-        return user_pydantic
-
-    return None
-
+        return None
+    except Exception as e:
+        logger.error(f"Error finding user by login or email ({email_login}): {str(e)}")
+        return None
 
 async def delete_user(db: AsyncSession, user: User):
     cache_key = f"user:{user.login}"
@@ -46,7 +48,6 @@ async def delete_user(db: AsyncSession, user: User):
     except Exception as e:
         logger.error(f"Error deleting user {user.login}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
-
 
 async def update_user(user_update: UserUpdate, db: AsyncSession, current_user: User):
     cache_key = f"user:{current_user.login}"
@@ -81,8 +82,7 @@ async def update_user(user_update: UserUpdate, db: AsyncSession, current_user: U
             user.aim = user_update.aim
         if user_update.recommended_calories is not None:
             user.recommended_calories = user_update.recommended_calories
-        if user_update.profile_image is not None:
-            user.profile_image = user_update.profile_image
+
 
         # Обновление веса пользователя
         if user.weight:
@@ -91,6 +91,12 @@ async def update_user(user_update: UserUpdate, db: AsyncSession, current_user: U
                 weight=user.weight,
             )
             await save_or_update_weight(user_weight, db, current_user.id)
+
+        if all([user.weight, user.height, user.age, user.gender, user.aim, user.activity_level]):
+            result = await calculate_recommended_nutrients(UserCalculateNutrients.model_validate(user))
+            user_update.recommended_calories = result["calories"]
+
+        logger.warning(f"Недостаточно данных для расчета нутриентов у пользователя {user.id}")
 
         await db.commit()
         await db.refresh(user)
@@ -103,19 +109,19 @@ async def update_user(user_update: UserUpdate, db: AsyncSession, current_user: U
         logger.error(f"Error updating user {current_user.login}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-
-async def calculate_recommended_nutrients(user: UserRead):
+async def calculate_recommended_nutrients(user: UserCalculateNutrients):
     """
     Рассчитывает рекомендуемое количество калорий, белков, жиров и углеводов в день
     на основе пола, роста, возраста, веса, цели и уровня активности пользователя.
     """
-    cache_key = f"user_nutrients:{user.id}"
+    if user.id is not None:
+        cache_key = f"user_nutrients:{user.id}"
 
-    # Проверяем кэш
-    cached_data = await cache.get(cache_key)
-    if cached_data:
-        logger.info(f"Данные о нутриентах загружены из кэша для пользователя {user.id}")
-        return cached_data
+        # Проверяем кэш
+        cached_data = await cache.get(cache_key)
+        if cached_data:
+            logger.info(f"Данные о нутриентах загружены из кэша для пользователя {user.id}")
+            return cached_data
 
     logger.info(f"Расчет нутриентов для пользователя {user.id}")
 
@@ -180,9 +186,9 @@ async def calculate_recommended_nutrients(user: UserRead):
         "fat": fat,
         "carbohydrates": carbs
     }
-
-    # Запись в кэш на 24 часа
-    await cache.set(cache_key, result, expire=86400)
-    logger.info(f"Данные о нутриентах закэшированы для пользователя {user.id}")
+    if user.id is not None:
+        # Запись в кэш на 24 часа
+        await cache.set(cache_key, result, expire=86400)
+        logger.info(f"Данные о нутриентах закэшированы для пользователя {user.id}")
 
     return result
