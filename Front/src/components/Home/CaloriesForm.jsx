@@ -74,7 +74,7 @@ export default function CaloriesForm() {
               onChange={(e) => setGender(e.target.value)}
               className="input"
             >
-              <option value="">Пол</option>
+              <option value="" disabled>Пол</option>
               <option value="male">Мужчина</option>
               <option value="female">Женщина</option>
             </select>
@@ -83,7 +83,7 @@ export default function CaloriesForm() {
               onChange={(e) => setAim(e.target.value)}
               className="input"
             >
-              <option value="">Цель</option>
+              <option value="" disabled>Цель</option>
               <option value="loss">Похудение</option>
               <option value="maintain">Поддержание</option>
               <option value="gain">Набор массы</option>
@@ -93,7 +93,7 @@ export default function CaloriesForm() {
               onChange={(e) => setActivityLevel(e.target.value)}
               className="input"
             >
-              <option value="">Уровень активности</option>
+              <option value="" disabled>Уровень активности</option>
               <option value="sedentary">Малоподвижный</option>
               <option value="light">Лёгкий</option>
               <option value="moderate">Умеренный</option>

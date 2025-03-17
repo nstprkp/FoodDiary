@@ -21,6 +21,10 @@ a:hover {
   color: #001f3d;
 }
 
+.pot {
+  border-radius: 10px;
+}
+
 body {
   margin: 0;
   display: flex;

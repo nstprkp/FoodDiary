@@ -80,8 +80,13 @@ async def update_user(user_update: UserUpdate, db: AsyncSession, current_user: U
             user.gender = user_update.gender
         if user_update.aim is not None:
             user.aim = user_update.aim
+<<<<<<< HEAD
         if user_update.recommended_calories is not None:
             user.recommended_calories = user_update.recommended_calories
+=======
+        if user_update.activity_level is not None:
+            user.activity_level = user_update.activity_level
+>>>>>>> 6c16411 (Updated project( Front/Back))
 
 
         # Обновление веса пользователя
@@ -94,9 +99,16 @@ async def update_user(user_update: UserUpdate, db: AsyncSession, current_user: U
 
         if all([user.weight, user.height, user.age, user.gender, user.aim, user.activity_level]):
             result = await calculate_recommended_nutrients(UserCalculateNutrients.model_validate(user))
+<<<<<<< HEAD
             user_update.recommended_calories = result["calories"]
 
         logger.warning(f"Недостаточно данных для расчета нутриентов у пользователя {user.id}")
+=======
+            user.recommended_calories = result["calories"]
+            logger.warning(f"Расчет нутриентов у пользователя: {user.id} - прошёл успешно")
+        else:
+            logger.warning(f"Недостаточно данных для расчета нутриентов у пользователя {user.id}")
+>>>>>>> 6c16411 (Updated project( Front/Back))
 
         await db.commit()
         await db.refresh(user)
@@ -114,6 +126,7 @@ async def calculate_recommended_nutrients(user: UserCalculateNutrients):
     Рассчитывает рекомендуемое количество калорий, белков, жиров и углеводов в день
     на основе пола, роста, возраста, веса, цели и уровня активности пользователя.
     """
+<<<<<<< HEAD
     if user.id is not None:
         cache_key = f"user_nutrients:{user.id}"
 
@@ -123,6 +136,8 @@ async def calculate_recommended_nutrients(user: UserCalculateNutrients):
             logger.info(f"Данные о нутриентах загружены из кэша для пользователя {user.id}")
             return cached_data
 
+=======
+>>>>>>> 6c16411 (Updated project( Front/Back))
     logger.info(f"Расчет нутриентов для пользователя {user.id}")
 
     if not all([user.weight, user.height, user.age, user.gender, user.aim, user.activity_level]):
@@ -186,9 +201,12 @@ async def calculate_recommended_nutrients(user: UserCalculateNutrients):
         "fat": fat,
         "carbohydrates": carbs
     }
+<<<<<<< HEAD
     if user.id is not None:
         # Запись в кэш на 24 часа
         await cache.set(cache_key, result, expire=86400)
         logger.info(f"Данные о нутриентах закэшированы для пользователя {user.id}")
+=======
+>>>>>>> 6c16411 (Updated project( Front/Back))
 
     return result

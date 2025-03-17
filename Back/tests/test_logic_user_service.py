@@ -149,7 +149,11 @@ async def test_update_user():
             assert updated_user.weight == 75
             assert updated_user.gender == "female"
             assert updated_user.aim == "lose"
+<<<<<<< HEAD
             assert updated_user.recommended_calories == 2300
+=======
+            assert updated_user.recommended_calories == 2500
+>>>>>>> 6c16411 (Updated project( Front/Back))
 
             # Проверяем, что был вызван commit
             mock_db.commit.assert_called_once()
