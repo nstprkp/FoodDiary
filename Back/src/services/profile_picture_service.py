@@ -7,7 +7,10 @@ ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif"}
 
 
 async def upload_profile_picture(file: UploadFile, current_user: User, db: AsyncSession):
+<<<<<<< HEAD
     """Загружает фото профиля пользователя"""
+=======
+>>>>>>> 6c16411 (Updated project( Front/Back))
     if file.content_type not in ALLOWED_IMAGE_TYPES:
         raise HTTPException(status_code=400, detail="Only images (JPEG, PNG, GIF) are allowed")
 
@@ -29,7 +32,10 @@ async def upload_profile_picture(file: UploadFile, current_user: User, db: Async
 
 
 async def get_profile_picture(current_user: User, db: AsyncSession):
+<<<<<<< HEAD
     """Возвращает фото профиля пользователя"""
+=======
+>>>>>>> 6c16411 (Updated project( Front/Back))
     user = await db.get(User, current_user.id)
     if not user or not user.profile_picture:
         raise HTTPException(status_code=404, detail="No profile picture found")

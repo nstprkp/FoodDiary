@@ -23,13 +23,25 @@ header.header-banner {
   position: sticky;
   top: 0;
   width: 100%;
+<<<<<<< HEAD
   height: 80px;
+=======
+  height: 85px;
+>>>>>>> 9d6214e (Updated project)
   background-image: url("https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80");
   background-size: cover;
   background-position: center;
   overflow: hidden;
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+<<<<<<< HEAD
+=======
+  transition: transform 0.5s ease; /* Плавное увеличение с продолжительностью 0.3 секунд */
+}
+
+header.header-banner:hover {
+  transform: scale(1.02); /* Увеличиваем на 5% */
+>>>>>>> 9d6214e (Updated project)
 }
 
 .header-overlay {
@@ -64,8 +76,13 @@ header.header-banner {
 }
 
 .avatar-image {
+<<<<<<< HEAD
   width: 50px;
   height: 50px;
+=======
+  width: 60px;
+  height: 60px;
+>>>>>>> 9d6214e (Updated project)
   border-radius: 50%;
   border: 3px solid white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -131,7 +148,11 @@ header.header-banner {
 
 .profile-aim {
   margin: 5px 0 0 0;
+<<<<<<< HEAD
   font-size: 14px;
+=======
+  font-size: 16px;
+>>>>>>> 9d6214e (Updated project)
   opacity: 0.9;
   display: flex;
   align-items: center;
@@ -147,7 +168,10 @@ header.header-banner {
   position: relative;
   z-index: 2;
   padding: 20px 0;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9d6214e (Updated project)
 }
 
 /* Кнопка для отображения меню */
@@ -339,7 +363,11 @@ header.header-banner {
   position: relative;
   z-index: 3;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+<<<<<<< HEAD
   padding-top: 100px;
+=======
+  margin-top: 370px;
+>>>>>>> 9d6214e (Updated project)
 }
 
 .profile-content:hover {
@@ -351,11 +379,19 @@ header.header-banner {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #f3f4f6;
   background-color: #f9fafb;
+<<<<<<< HEAD
   padding-top: 250px;
+=======
+  padding-top: 20px;
+>>>>>>> 9d6214e (Updated project)
 }
 
 .profile-header h2 {
   margin: 0;
+<<<<<<< HEAD
+=======
+  text-align: center;
+>>>>>>> 9d6214e (Updated project)
   color: #4a148c;
 }
 
@@ -389,14 +425,25 @@ header.header-banner {
 }
 
 .info-label {
+<<<<<<< HEAD
   margin: 0 0 0.25rem 0;
   font-size: 0.875rem;
+=======
+  margin: 0 0 0.15rem 0;
+  text-align: left;
+  font-size: 0.9rem;
+>>>>>>> 9d6214e (Updated project)
   color: #6b7280;
 }
 
 .info-value {
   margin: 0;
+<<<<<<< HEAD
   font-weight: 500;
+=======
+  font-weight: 450;
+  font-size: 1.4rem;
+>>>>>>> 9d6214e (Updated project)
   color: #111827;
 }
 
@@ -456,13 +503,22 @@ header.header-banner {
 
 .section-label {
   margin: 0 0 0.5rem 0;
+<<<<<<< HEAD
   font-size: 0.875rem;
+=======
+  font-size: 0.9rem;
+>>>>>>> 9d6214e (Updated project)
   color: #6b7280;
 }
 
 .section-value {
   margin: 0;
+<<<<<<< HEAD
   font-weight: 500;
+=======
+  font-weight: 450;
+  font-size: 1.4rem;
+>>>>>>> 9d6214e (Updated project)
   color: #111827;
 }
 
@@ -603,20 +659,53 @@ header.header-banner {
   font-size: 0.875rem;
   font-weight: 500;
   color: #4b5563;
+<<<<<<< HEAD
+=======
+  margin-bottom: 5px;
+>>>>>>> 9d6214e (Updated project)
 }
 
 .form-group input,
 .form-group select {
+<<<<<<< HEAD
   padding: 0.625rem 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
   font-size: 0.875rem;
   transition: all 0.2s ease;
   width: 100%;
+=======
+  margin-top: 0px;
+  width: 100%; /* Автоматически подстраиваться */
+  max-width: 340px; /* Ограничение по ширине */
+  height: 40px; /* Единая высота */
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+  box-sizing: border-box; /* Учитывает padding в ширине */
+  background-color: #dfdfdf; /* Цвет как на скрине */
+  color: black;
+}
+
+.form-group select {
+  appearance: none; /* Убираем стандартное оформление */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2rem; /* Отступ для стрелки */
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='%239ca3af'><path d='M7 10l5 5 5-5z'></path></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px;
+>>>>>>> 9d6214e (Updated project)
 }
 
 .form-group input:focus,
 .form-group select:focus {
+<<<<<<< HEAD
+=======
+  background-color: #f3f4f6;
+>>>>>>> 9d6214e (Updated project)
   border-color: #7c3aed;
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
   outline: none;
@@ -640,12 +729,22 @@ header.header-banner {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.625rem 0.75rem;
+<<<<<<< HEAD
   background-color: #f9fafb;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
   font-size: 0.875rem;
   color: #4b5563;
   cursor: pointer;
+=======
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+  color: black;
+  background-color: #dfdfdf;
+  cursor: pointer;
+  width: 340px;
+>>>>>>> 9d6214e (Updated project)
   transition: all 0.2s ease;
 }
 
@@ -660,7 +759,11 @@ header.header-banner {
 }
 
 .upload-icon {
+<<<<<<< HEAD
   color: #7c3aed;
+=======
+  color: black;
+>>>>>>> 9d6214e (Updated project)
 }
 
 .photo-upload-note {
@@ -939,5 +1042,9 @@ header.header-banner {
 
 .ml-2 {
   margin-left: 0.5rem;
+<<<<<<< HEAD
 }
 
+=======
+}
+>>>>>>> 9d6214e (Updated project)
