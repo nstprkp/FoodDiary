@@ -1,11 +1,4 @@
 "use client"
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
->>>>>>> 9d6214e (Updated project)
-=======
->>>>>>> main
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import "./Profile.css"
@@ -86,15 +79,7 @@ export default function Profile() {
       }
 
       // Загружаем фото профиля, если оно есть
-<<<<<<< HEAD
-<<<<<<< HEAD
-      if (data.user.has_profile_picture) {
-=======
       if (data.has_profile_picture) {
->>>>>>> 9d6214e (Updated project)
-=======
-      if (data.has_profile_picture) {
->>>>>>> main
         fetchProfilePicture()
       }
     } catch (error) {
@@ -127,20 +112,11 @@ export default function Profile() {
       if (response.ok) {
         const blob = await response.blob()
         const imageUrl = URL.createObjectURL(blob)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> main
         // Очистка предыдущего объекта, чтобы избежать утечек памяти
         if (profilePicture) {
           URL.revokeObjectURL(profilePicture);
         
         }
-<<<<<<< HEAD
->>>>>>> 9d6214e (Updated project)
-=======
->>>>>>> main
         setProfilePicture(imageUrl)
       }
     } catch (error) {
@@ -846,22 +822,9 @@ export default function Profile() {
                       <div className="form-group">
                         <label htmlFor="gender">Пол</label>
                         <select id="gender" name="gender" value={editedData.gender || ""} onChange={handleInputChange}>
-<<<<<<< HEAD
-<<<<<<< HEAD
-                          <option value="">Выберите пол</option>
-                          <option value="male">Мужской</option>
-                          <option value="female">Женский</option>
-                          <option value="other">Другой</option>
-=======
                           <option value="" disabled>Выберите пол</option>
                           <option value="male">Мужской</option>
                           <option value="female">Женский</option>
->>>>>>> 9d6214e (Updated project)
-=======
-                          <option value="" disabled>Выберите пол</option>
-                          <option value="male">Мужской</option>
-                          <option value="female">Женский</option>
->>>>>>> main
                         </select>
                       </div>
                       <div className="form-group">
@@ -923,15 +886,7 @@ export default function Profile() {
                       <div className="form-group">
                         <label htmlFor="aim">Цель</label>
                         <select id="aim" name="aim" value={editedData.aim || ""} onChange={handleInputChange}>
-<<<<<<< HEAD
-<<<<<<< HEAD
-                          <option value="">Выберите цель</option>
-=======
                           <option value="" disabled>Выберите цель</option>
->>>>>>> 9d6214e (Updated project)
-=======
-                          <option value="" disabled>Выберите цель</option>
->>>>>>> main
                           <option value="loss">Снижение веса</option>
                           <option value="gain">Набор веса</option>
                           <option value="maintain">Поддержание веса</option>
@@ -945,15 +900,7 @@ export default function Profile() {
                           value={editedData.activity_level || ""}
                           onChange={handleInputChange}
                         >
-<<<<<<< HEAD
-<<<<<<< HEAD
-                          <option value="">Выберите уровень активности</option>
-=======
                           <option value="" disabled>Выберите уровень активности</option>
->>>>>>> 9d6214e (Updated project)
-=======
-                          <option value="" disabled>Выберите уровень активности</option>
->>>>>>> main
                           <option value="sedentary">Сидячий образ жизни</option>
                           <option value="light">Легкая активность</option>
                           <option value="moderate">Умеренная активность</option>
@@ -986,13 +933,4 @@ export default function Profile() {
       </AnimatePresence>
     </motion.div>
   )
-<<<<<<< HEAD
-<<<<<<< HEAD
 }
-
-=======
-}
->>>>>>> 9d6214e (Updated project)
-=======
-}
->>>>>>> main

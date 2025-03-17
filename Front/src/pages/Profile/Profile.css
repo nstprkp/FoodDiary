@@ -23,35 +23,18 @@ header.header-banner {
   position: sticky;
   top: 0;
   width: 100%;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  height: 80px;
-=======
   height: 85px;
->>>>>>> 9d6214e (Updated project)
-=======
-  height: 85px;
->>>>>>> main
   background-image: url("https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80");
   background-size: cover;
   background-position: center;
   overflow: hidden;
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> main
   transition: transform 0.5s ease; /* Плавное увеличение с продолжительностью 0.3 секунд */
 }
 
 header.header-banner:hover {
   transform: scale(1.02); /* Увеличиваем на 5% */
-<<<<<<< HEAD
->>>>>>> 9d6214e (Updated project)
-=======
->>>>>>> main
 }
 
 .header-overlay {
@@ -86,18 +69,8 @@ header.header-banner:hover {
 }
 
 .avatar-image {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  width: 50px;
-  height: 50px;
-=======
   width: 60px;
   height: 60px;
->>>>>>> 9d6214e (Updated project)
-=======
-  width: 60px;
-  height: 60px;
->>>>>>> main
   border-radius: 50%;
   border: 3px solid white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -163,15 +136,7 @@ header.header-banner:hover {
 
 .profile-aim {
   margin: 5px 0 0 0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  font-size: 14px;
-=======
   font-size: 16px;
->>>>>>> 9d6214e (Updated project)
-=======
-  font-size: 16px;
->>>>>>> main
   opacity: 0.9;
   display: flex;
   align-items: center;
@@ -187,13 +152,6 @@ header.header-banner:hover {
   position: relative;
   z-index: 2;
   padding: 20px 0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
->>>>>>> 9d6214e (Updated project)
-=======
->>>>>>> main
 }
 
 /* Кнопка для отображения меню */
@@ -385,15 +343,7 @@ header.header-banner:hover {
   position: relative;
   z-index: 3;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  padding-top: 100px;
-=======
   margin-top: 370px;
->>>>>>> 9d6214e (Updated project)
-=======
-  margin-top: 370px;
->>>>>>> main
 }
 
 .profile-content:hover {
@@ -405,27 +355,12 @@ header.header-banner:hover {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #f3f4f6;
   background-color: #f9fafb;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  padding-top: 250px;
-=======
   padding-top: 20px;
->>>>>>> 9d6214e (Updated project)
-=======
-  padding-top: 20px;
->>>>>>> main
 }
 
 .profile-header h2 {
   margin: 0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
   text-align: center;
->>>>>>> 9d6214e (Updated project)
-=======
-  text-align: center;
->>>>>>> main
   color: #4a148c;
 }
 
@@ -459,36 +394,16 @@ header.header-banner:hover {
 }
 
 .info-label {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  margin: 0 0 0.25rem 0;
-  font-size: 0.875rem;
-=======
   margin: 0 0 0.15rem 0;
   text-align: left;
   font-size: 0.9rem;
->>>>>>> 9d6214e (Updated project)
-=======
-  margin: 0 0 0.15rem 0;
-  text-align: left;
-  font-size: 0.9rem;
->>>>>>> main
   color: #6b7280;
 }
 
 .info-value {
   margin: 0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  font-weight: 500;
-=======
   font-weight: 450;
   font-size: 1.4rem;
->>>>>>> 9d6214e (Updated project)
-=======
-  font-weight: 450;
-  font-size: 1.4rem;
->>>>>>> main
   color: #111827;
 }
 
@@ -548,31 +463,14 @@ header.header-banner:hover {
 
 .section-label {
   margin: 0 0 0.5rem 0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  font-size: 0.875rem;
-=======
   font-size: 0.9rem;
->>>>>>> 9d6214e (Updated project)
-=======
-  font-size: 0.9rem;
->>>>>>> main
   color: #6b7280;
 }
 
 .section-value {
   margin: 0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  font-weight: 500;
-=======
   font-weight: 450;
   font-size: 1.4rem;
->>>>>>> 9d6214e (Updated project)
-=======
-  font-weight: 450;
-  font-size: 1.4rem;
->>>>>>> main
   color: #111827;
 }
 
@@ -713,29 +611,11 @@ header.header-banner:hover {
   font-size: 0.875rem;
   font-weight: 500;
   color: #4b5563;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
   margin-bottom: 5px;
->>>>>>> 9d6214e (Updated project)
-=======
-  margin-bottom: 5px;
->>>>>>> main
 }
 
 .form-group input,
 .form-group select {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  padding: 0.625rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  width: 100%;
-=======
-=======
->>>>>>> main
   margin-top: 0px;
   width: 100%; /* Автоматически подстраиваться */
   max-width: 340px; /* Ограничение по ширине */
@@ -758,22 +638,11 @@ header.header-banner:hover {
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   background-size: 16px;
-<<<<<<< HEAD
->>>>>>> 9d6214e (Updated project)
-=======
->>>>>>> main
 }
 
 .form-group input:focus,
 .form-group select:focus {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
   background-color: #f3f4f6;
->>>>>>> 9d6214e (Updated project)
-=======
-  background-color: #f3f4f6;
->>>>>>> main
   border-color: #7c3aed;
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
   outline: none;
@@ -797,17 +666,6 @@ header.header-banner:hover {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.625rem 0.75rem;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  background-color: #f9fafb;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  color: #4b5563;
-  cursor: pointer;
-=======
-=======
->>>>>>> main
   border: 1px solid #d1d5db;
   border-radius: 0.4rem;
   font-size: 0.9rem;
@@ -815,10 +673,6 @@ header.header-banner:hover {
   background-color: #dfdfdf;
   cursor: pointer;
   width: 340px;
-<<<<<<< HEAD
->>>>>>> 9d6214e (Updated project)
-=======
->>>>>>> main
   transition: all 0.2s ease;
 }
 
@@ -833,15 +687,7 @@ header.header-banner:hover {
 }
 
 .upload-icon {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  color: #7c3aed;
-=======
   color: black;
->>>>>>> 9d6214e (Updated project)
-=======
-  color: black;
->>>>>>> main
 }
 
 .photo-upload-note {
@@ -1120,13 +966,4 @@ header.header-banner:hover {
 
 .ml-2 {
   margin-left: 0.5rem;
-<<<<<<< HEAD
-<<<<<<< HEAD
 }
-
-=======
-}
->>>>>>> 9d6214e (Updated project)
-=======
-}
->>>>>>> main
