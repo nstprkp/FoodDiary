@@ -153,8 +153,8 @@ body {
   flex-direction: row;
   justify-content: space-between;
   position: relative; /* Абсолютное позиционирование */
-  top: 50%; /* Центрирование по вертикали */
-  transform: translateY(-18%); /* Смещение вверх на 50% высоты элемента */
+  top: auto; /* Центрирование по вертикали */
+  transform: none; /* Смещение вверх на 50% высоты элемента */
   z-index: 2;
   padding: 20px 0;
   height: 100%;
@@ -412,7 +412,6 @@ body {
   position: relative;
   z-index: 3;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin-top: 370px;
 }
 
 .weight-content:hover {
