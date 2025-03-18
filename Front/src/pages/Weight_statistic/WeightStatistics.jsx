@@ -436,18 +436,18 @@ useEffect(() => {
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center h-screen profile-container">
-          <div className="loading-spinner"></div>
-          <span className="ml-2 text-white">Загрузка данных...</span>
+        <div className="weight-flex weight-items-center weight-justify-center h-screen weight-container">
+          <div className="weight-loading-spinner"></div>
+          <span className="weight-ml-2 text-white">Загрузка данных...</span>
         </div>
     )
   }
 
   if (error && !userData) {
     return (
-        <div className="flex flex-col items-center justify-center h-screen profile-container">
-          <p className="text-white text-lg">Произошла ошибка: {error}</p>
-          <button onClick={() => (window.location.href = "/login")} className="custom-button mt-4">
+        <div className="weight-flex weight-flex-col weight-items-center weight-justify-center h-screen weight-container">
+          <p className="text-white weight-text-lg">Произошла ошибка: {error}</p>
+          <button onClick={() => (window.location.href = "/login")} className="custom-button weight-mt-4">
             Вернуться на страницу входа
           </button>
         </div>
@@ -463,14 +463,14 @@ useEffect(() => {
       >
         {/* Хедер */}
         <header className="header-banner">
-          <div className="header-overlay">
-            <div className="header-content">
-              <div className="profile-avatar">
-                <div className="avatar-container">
+          <div className="weight-header-overlay">
+            <div className="weight-header-content">
+              <div className="weight-profile-avatar">
+                <div className="weight-avatar-container">
                   <img
                       src={profilePicture || "/placeholder.svg?height=96&width=96"}
                       alt={userData.login}
-                      className="avatar-image"
+                      className="weight-avatar-image"
                   />
                   <input
                       type="file"
@@ -480,11 +480,11 @@ useEffect(() => {
                       style={{ display: "none" }}
                   />
                 </div>
-                <div className="profile-name">
+                <div className="weight-profile-name">
                   <h1>{getFullName(userData)}</h1>
                   {userData.aim && (
-                      <p className="profile-aim">
-                        <Target size={16} className="aim-icon" />
+                      <p className="weight-profile-aim">
+                        <Target size={16} className="weight-aim-icon" />
                         {translateValue(userData.aim, "aim")}
                       </p>
                   )}
@@ -492,7 +492,7 @@ useEffect(() => {
               </div>
 
               <button
-                  className="menu-button"
+                  className="weight-menu-button"
                   onClick={() => setMenuVisible(!menuVisible)}
                   aria-label={menuVisible ? "Закрыть меню" : "Открыть меню"}
               >
@@ -512,32 +512,32 @@ useEffect(() => {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.2 }}
               >
-                <div className="menu-header">
+                <div className="weight-menu-header">
                   <p>Меню</p>
                 </div>
                 <button onClick={() =>
                     navigate("/profile")}
-                        className="menu-button-item">
+                        className="weight-menu-button-item">
                   <User size={18}/>
                   <span>Мой профиль</span>
                 </button>
-                <button className="menu-button-item">
+                <button className="weight-menu-button-item">
                   <Book size={18} />
                   <span>Дневник питания</span>
                 </button>
-                <button className="menu-button-item">
+                <button className="weight-menu-button-item">
                   <Apple size={18} />
                   <span>Мои продукты</span>
                 </button>
-                <button onClick={() => navigate("/weight-statistics")} className="menu-button-item">
+                <button onClick={() => navigate("/weight-statistics")} className="weight-menu-button-item">
                   <BarChart size={18} />
                   <span>Статистика веса</span>
                 </button>
-                <button className="menu-button-item">
+                <button className="weight-menu-button-item">
                   <Settings size={18} />
                   <span>Настройки</span>
                 </button>
-                <button onClick={handleLogout} className="menu-button-item logout-button">
+                <button onClick={handleLogout} className="weight-menu-button-item weight-logout-button">
                   <LogOut size={18} />
                   <span>Выйти из системы</span>
                 </button>
@@ -547,82 +547,24 @@ useEffect(() => {
 
         {/* Основной контент */}
         <div className="weight-main-content">
-          <div className="container_add mx-auto py-8 px-4">
-            <div className="weight-grid weight-grid-cols-1 lg:grid-cols-6 gap-6">
-              {/* Левая колонка - информация о пользователе */}
-              <div className="profile-content lg:col-span-1">
-                <div className="profile-header">
-                  <h2 className="text-xl font-bold">Основная информация</h2>
+          <div className="weight-container_add weight-mx-auto weight-py-8 weight-px-4">
+            <div className="weight-grid weight-grid-cols-1 lg:grid-cols-6 weight-gap-6">
+              {/* Левая колонка - просмотр профиля */}
+              <div className="weight-content lg:col-span-2">
+                <div className="weight-header">
+                  <h2 className="weight-text-xl weight-font-bold">Статистика веса</h2>
                 </div>
-                <div className="profile-body">
-                  <div className="info-items">
-                    <div className="info-item">
-                      <User size={20} className="info-icon"/>
-                      <div>
-                        <p className="info-label">Логин</p>
-                        <p className="info-value">{userData.login}</p>
-                      </div>
-                    </div>
-
-                    {userData.email && (
-                        <div className="info-item">
-                          <Mail size={20} className="info-icon"/>
-                          <div>
-                            <p className="info-label">Email</p>
-                            <p className="info-value">{userData.email}</p>
-                          </div>
-                        </div>
-                    )}
-
-                    {userData.age && (
-                        <div className="info-item">
-                          <Cake size={20} className="info-icon"/>
-                          <div>
-                            <p className="info-label">Возраст</p>
-                            <p className="info-value">{userData.age} лет</p>
-                          </div>
-                        </div>
-                    )}
-
-                    {userData.gender && (
-                        <div className="info-item">
-                          <Users size={20} className="info-icon"/>
-                          <div>
-                            <p className="info-label">Пол</p>
-                            <p className="info-value">{translateValue(userData.gender, "gender")}</p>
-                          </div>
-                        </div>
-                    )}
-
-                    {userData.registered_at && (
-                        <div className="info-item">
-                          <Calendar size={20} className="info-icon"/>
-                          <div>
-                            <p className="info-label">Дата регистрации</p>
-                            <p className="info-value">{formatDate(userData.registered_at)}</p>
-                          </div>
-                        </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Правая колонка - просмотр профиля */}
-              <div className="profile-content lg:col-span-2">
-                <div className="profile-header">
-                  <h2 className="text-xl font-bold">Статистика веса</h2>
-                </div>
-                <div className="profile-body">
-                  <div className="profile-sections">
-                    <div className="profile-section">
-                      <h3 className="section-title">
-                        <Ruler size={18} className="section-icon"/>
+                <div className="weight-body">
+                  <div className="weight-sections">
+                    <div className="weight-section">
+                      <h3 className="weight-section-title">
+                        <Ruler size={18} className="weight-section-icon"/>
                         Актуальные данные
                       </h3>
-                      <div className="section-grid">
+                      <div className="weight-section-grid">
                         <div className="weight-section-item">
-                          <p className="section-label">Текущий вес</p>
-                          <p className="section-value">{userData.weight ? `${userData.weight} кг` : "—"}</p>
+                          <p className="weight-section-label">Текущий вес</p>
+                          <p className="weight-section-value">{userData.weight ? `${userData.weight} кг` : "—"}</p>
                         </div>
                         <div className="weight-section-item">
                           <button onClick={() => {setIsEditing(true)}} className="update-weight-button weight-section-item">
@@ -632,19 +574,19 @@ useEffect(() => {
                       </div>
                     </div>
 
-                    <div className="profile-section">
-                      <h3 className="section-title">
-                        <Target size={18} className="section-icon"/>
+                    <div className="weight-section">
+                      <h3 className="weight-section-title">
+                        <Target size={18} className="weight-section-icon"/>
                         Цели и активность
                       </h3>
-                      <div className="section-grid">
+                      <div className="weight-section-grid">
                         <div className="weight-section-item">
-                          <p className="section-label">Цель</p>
-                          <p className="section-value">{translateValue(userData.aim, "aim")}</p>
+                          <p className="weight-section-label">Цель</p>
+                          <p className="weight-section-value">{translateValue(userData.aim, "aim")}</p>
                         </div>
                         <div className="weight-section-item">
-                          <p className="section-label">Уровень активности</p>
-                          <p className="section-value">{translateValue(userData.activity_level, "activity_level")}</p>
+                          <p className="weight-section-label">Уровень активности</p>
+                          <p className="weight-section-value">{translateValue(userData.activity_level, "activity_level")}</p>
                         </div>
                       </div>
                     </div>
@@ -653,18 +595,18 @@ useEffect(() => {
               </div>
 
               {/* График веса */}
-              <div className="profile-content lg:col-span-3">
-                <div className="profile-header">
-                  <h2 className="text-xl font-bold">График веса</h2>
+              <div className="weight-content lg:col-span-4">
+                <div className="weight-header">
+                  <h2 className="weight-text-xl weight-font-bold">График веса</h2>
                 </div>
-                <div className="profile-body">
-                  <div className="profile-sections">
-                    <div className="profile-section">
-                      <h3 className="section-title">
-                        <Weight size={18} className="section-icon"/>
+                <div className="weight-body">
+                  <div className="weight-sections">
+                    <div className="weight-section">
+                      <h3 className="weight-section-title">
+                        <Weight size={18} className="weight-section-icon"/>
                         Хронология изменений
                       </h3>
-                      <div className="section-grid">
+                      <div className="weight-section-grid">
                         <WeightChart weightHistory={weightHistory} />
                       </div>
                     </div>
@@ -690,7 +632,7 @@ useEffect(() => {
                     <Weight size={20} className="weight-icon" />
                     История изменения веса
                   </h2>
-                  <button className="chart-close-button" onClick={toggleWeightChart}>
+                  <button className="weight-chart-close-button" onClick={toggleWeightChart}>
                     ✕
                   </button>
                 </div>
@@ -722,25 +664,25 @@ useEffect(() => {
                     exit={{ scale: 0.9, opacity: 0 }}
                     transition={{ type: "spring", damping: 20 }}
                 >
-                  <div className="modal-header">
+                  <div className="weight-modal-header">
                     <h2>
-                      <Edit size={20} className="modal-icon" />
+                      <Edit size={20} className="weight-modal-icon" />
                       Редактирование профиля
                     </h2>
-                    <button className="modal-close" onClick={cancelEditing}>
+                    <button className="weight-modal-close" onClick={cancelEditing}>
                       ✕
                     </button>
                   </div>
-                  <div className="modal-body">
-                    <div className="edit-form">
+                  <div className="weight-modal-body">
+                    <div className="weight-edit-form">
 
-                      <div className="form-section">
+                      <div className="weight-form-section">
                         <h3>
-                          <Ruler size={16} className="form-icon" />
+                          <Ruler size={16} className="weight-form-icon" />
                           Физические параметры
                         </h3>
-                        <div className="form-row">
-                          <div className="form-group">
+                        <div className="weight-form-row">
+                          <div className="weight-form-group">
                             <label htmlFor="weight">Вес (кг)</label>
                             <input
                                 type="number"
@@ -756,14 +698,14 @@ useEffect(() => {
                       </div>
                     </div>
                   </div>
-                  <div className="modal-footer">
-                    <button className="cancel-button" onClick={cancelEditing}>
+                  <div className="weight-modal-footer">
+                    <button className="weight-cancel-button" onClick={cancelEditing}>
                       Отмена
                     </button>
-                    <button className="save-button" onClick={saveProfile} disabled={saving}>
+                    <button className="weight-save-button" onClick={saveProfile} disabled={saving}>
                       {saving ? (
                           <>
-                            <span className="loading-spinner-small"></span>
+                            <span className="weight-loading-spinner-small"></span>
                             <span>Сохранение...</span>
                           </>
                       ) : (
