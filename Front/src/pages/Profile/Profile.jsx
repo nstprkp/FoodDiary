@@ -21,6 +21,7 @@ import {
   Camera,
   Upload,
 } from "lucide-react"
+import {useNavigate} from "react-router-dom";
 
 export default function Profile() {
   const [userData, setUserData] = useState(null)
@@ -36,6 +37,7 @@ export default function Profile() {
   const [profilePicture, setProfilePicture] = useState(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const fileInputRef = useRef(null)
+  const navigate = useNavigate();
 
   // Простая реализация toast
   const toast = {
@@ -183,6 +185,11 @@ export default function Profile() {
   // Получение рекомендуемых нутриентов
   const fetchNutrients = async () => {
     try {
+      let age;
+      let height;
+      let weight;
+      let gender;
+      let activity_level;
       const response = await fetch('http://localhost:8000/calculate_nutrients', {
         method: 'POST',
         headers: {
@@ -509,7 +516,7 @@ export default function Profile() {
               <Apple size={18} />
               <span>Мои продукты</span>
             </button>
-            <button onClick={toggleWeightChart} className="menu-button-item">
+            <button onClick={() => navigate("/weight-statistics")} className="menu-button-item">
               <BarChart size={18} />
               <span>Статистика веса</span>
             </button>
