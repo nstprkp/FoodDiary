@@ -1,16 +1,17 @@
 /* Контейнер секции */
 .problems-solutions {
     background-color: #dfdfdf;
-    margin-top: 65px;
+    margin-top: 63px;
     width: 100%;
     text-align: center;
   }
   
   /* Заголовок секции */
-  .section-title {
+  .section-title-problems-and-solutions {
     font-size: 30px;
     font-weight: bold;
     color: #000000df;
+    text-align: center;
     display: inline-block;
     margin-top: 30px;
     margin-bottom: 10px;

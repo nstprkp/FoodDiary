@@ -17,12 +17,9 @@ a {
   color: #001f3d;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #001f3d;
-}
-
-.pot {
-  border-radius: 10px;
 }
 
 body {

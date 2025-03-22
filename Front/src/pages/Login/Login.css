@@ -85,9 +85,3 @@
 .home-btn:hover {
     color: #b1b1b1;
 }
-
-.error-message {
-    color: #ff4d4d;
-    font-size: 15px;
-    margin-bottom: 10px;
-}
