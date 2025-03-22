@@ -30,7 +30,7 @@ export default function Menu({ menuVisible, setMenuVisible, setIsEditing, handle
             <Edit size={18} />
             <span>Редактировать профиль</span>
           </button>
-          <button className="menu-button-item">
+          <button onClick={() => navigate("/diary")} className="menu-button-item">
             <Book size={18} />
             <span>Дневник питания</span>
           </button>

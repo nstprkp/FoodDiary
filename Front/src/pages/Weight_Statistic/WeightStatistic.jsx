@@ -56,14 +56,14 @@ export default function WeightStatistic() {
         activity_level: editedData.activity_level,
         recommended_calories: editedData.recommended_calories,
       };
-
+  
       // Удаляем пустые значения
       Object.keys(dataToSend).forEach((key) => {
         if (dataToSend[key] === null || dataToSend[key] === undefined) {
           delete dataToSend[key];
         }
       });
-
+  
       const response = await fetch("http://localhost:8000/user/me", {
         method: "PUT",
         headers: {
@@ -72,12 +72,12 @@ export default function WeightStatistic() {
         },
         body: JSON.stringify(dataToSend),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || "Не удалось обновить профиль");
       }
-
+  
       const data = await response.json();
       setUserData(data.user);
       setEditedData(data.user);
@@ -85,7 +85,12 @@ export default function WeightStatistic() {
       setMenuVisible(false);
       showToast("Профиль обновлен", "Ваши данные успешно сохранены");
     } catch (error) {
-      setError(error.message);
+      // Обработка сетевых ошибок
+      if (error.name === "TypeError" || error.message.includes("Failed to fetch")) {
+        setError("Ошибка сети: не удалось подключиться к серверу");
+      } else {
+        setError(error.message);
+      }
       showToast("Ошибка при сохранении", error.message, "destructive");
     } finally {
       setSaving(false);
@@ -101,7 +106,7 @@ export default function WeightStatistic() {
         setLoading(false);
         return;
       }
-
+  
       const [userResponse, weightResponse] = await Promise.all([
         fetch("http://localhost:8000/user/me", {
           headers: { Authorization: `Bearer ${token}` },
@@ -110,24 +115,29 @@ export default function WeightStatistic() {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
-
+  
       if (!userResponse.ok || !weightResponse.ok) {
         const errorData = await userResponse.json().catch(() => null);
         throw new Error(errorData?.detail || "Не удалось получить данные");
       }
-
+  
       const userData = await userResponse.json();
       const weightData = await weightResponse.json();
-
+  
       setUserData(userData);
       setEditedData(userData);
       setWeightHistory(weightData);
-
+  
       if (userData.has_profile_picture) {
         fetchProfilePicture();
       }
     } catch (error) {
-      setError(error.message);
+      // Обработка сетевых ошибок
+      if (error.name === "TypeError" || error.message.includes("Failed to fetch")) {
+        setError("Ошибка сети: не удалось подключиться к серверу");
+      } else {
+        setError(error.message);
+      }
       showToast("Ошибка", error.message, "destructive");
     } finally {
       setLoading(false);
@@ -141,17 +151,22 @@ export default function WeightStatistic() {
       const response = await fetch("http://localhost:8000/photo/profile-picture", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       if (!response.ok) {
         throw new Error("Не удалось загрузить фото профиля");
       }
-
+  
       const blob = await response.blob();
       const imageUrl = URL.createObjectURL(blob);
       if (profilePicture) URL.revokeObjectURL(profilePicture);
       setProfilePicture(imageUrl);
     } catch (error) {
-      setError(error.message);
+      // Обработка сетевых ошибок
+      if (error.name === "TypeError" || error.message.includes("Failed to fetch")) {
+        setError("Ошибка сети: не удалось подключиться к серверу");
+      } else {
+        setError(error.message);
+      }
     }
   };
 
@@ -167,7 +182,12 @@ export default function WeightStatistic() {
       showToast("Выход выполнен", "Вы успешно вышли из системы");
       window.location.href = "/login";
     } catch (error) {
-      setError("Ошибка при выходе");
+      // Обработка сетевых ошибок
+      if (error.name === "TypeError" || error.message.includes("Failed to fetch")) {
+        setError("Ошибка сети: не удалось подключиться к серверу");
+      } else {
+        setError("Ошибка при выходе");
+      }
       localStorage.removeItem("access_token");
       window.location.href = "/login";
     }
@@ -232,15 +252,6 @@ export default function WeightStatistic() {
 
   if (loading) {
     return <LoadingSpinner />
-  }
-
-  if (loading) {
-    return (
-      <div className="weight-flex weight-items-center weight-justify-center h-screen weight-container">
-        <div className="weight-loading-spinner"></div>
-        <span className="weight-ml-2 text-white">Загрузка данных...</span>
-      </div>
-    );
   }
 
   return (
