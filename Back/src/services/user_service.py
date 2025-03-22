@@ -8,6 +8,7 @@ from src.schemas.user import UserUpdate, UserRead, UserCalculateNutrients
 from src.schemas.user_weight import UserWeightUpdate
 from src.services.user_weight_service import save_or_update_weight
 
+# Функция для поиска пользователя по логину или email
 async def find_user_by_login_and_email(db: AsyncSession, email_login: str):
     cache_key = f"user:{email_login}"
     try:
@@ -26,13 +27,16 @@ async def find_user_by_login_and_email(db: AsyncSession, email_login: str):
         if user:
             user_pydantic = UserRead.model_validate(user)
             await cache.set(cache_key, user_pydantic.model_dump(mode="json"), expire=3600)
+            logger.info(f"User {email_login} fetched from DB and cached")
             return user_pydantic
 
+        logger.warning(f"User {email_login} not found in database")
         return None
     except Exception as e:
         logger.error(f"Error finding user by login or email ({email_login}): {str(e)}")
         return None
 
+# Функция для удаления пользователя
 async def delete_user(db: AsyncSession, user: User):
     cache_key = f"user:{user.login}"
     try:
@@ -49,14 +53,14 @@ async def delete_user(db: AsyncSession, user: User):
         logger.error(f"Error deleting user {user.login}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+# Функция для обновления данных пользователя
 async def update_user(user_update: UserUpdate, db: AsyncSession, current_user: User):
     cache_key = f"user:{current_user.login}"
     try:
-
         query = select(User).where(or_(User.login == current_user.login, User.email == current_user.email))
         result = await db.execute(query)
         user = result.scalar_one_or_none()
-        print(user, type(user))
+
         if not user:
             logger.error(f"User not found in database: {current_user.login}")
             raise HTTPException(
@@ -83,7 +87,6 @@ async def update_user(user_update: UserUpdate, db: AsyncSession, current_user: U
         if user_update.activity_level is not None:
             user.activity_level = user_update.activity_level
 
-
         # Обновление веса пользователя
         if user.weight:
             user_weight = UserWeightUpdate(
@@ -91,6 +94,7 @@ async def update_user(user_update: UserUpdate, db: AsyncSession, current_user: U
                 weight=user.weight,
             )
             await save_or_update_weight(user_weight, db, current_user.id)
+            logger.info(f"User weight updated for user {current_user.login}")
 
         if all([user.weight, user.height, user.age, user.gender, user.aim, user.activity_level]):
             result = await calculate_recommended_nutrients(UserCalculateNutrients.model_validate(user))
@@ -102,14 +106,16 @@ async def update_user(user_update: UserUpdate, db: AsyncSession, current_user: U
         await db.commit()
         await db.refresh(user)
 
+        # Удаляем пользователя из кэша
         await cache.delete(cache_key)
-        logger.info(f"User deleted from cache: {current_user.login}")
+        logger.info(f"User {current_user.login} deleted from cache")
 
         return UserRead.model_validate(user)
     except Exception as e:
         logger.error(f"Error updating user {current_user.login}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+# Функция для расчета рекомендуемых нутриентов для пользователя
 async def calculate_recommended_nutrients(user: UserCalculateNutrients):
     """
     Рассчитывает рекомендуемое количество калорий, белков, жиров и углеводов в день
@@ -179,4 +185,5 @@ async def calculate_recommended_nutrients(user: UserCalculateNutrients):
         "carbohydrates": carbs
     }
 
+    logger.info(f"Calculated recommended nutrients for user {user.id}: {result}")
     return result

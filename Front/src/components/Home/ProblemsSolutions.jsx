@@ -5,7 +5,7 @@ import "./ProblemsSolutions.css";
 export default function ProblemSolution() {
   return (
     <section className="problems-solutions">
-      <h2 className="section-title">Проблемы и решения</h2>
+      <h2 className="section-title-problems-and-solutions">Проблемы и решения</h2>
       <div className="problem-solution-container">
         {/* Левая колонка - Проблемы */}
         <motion.div

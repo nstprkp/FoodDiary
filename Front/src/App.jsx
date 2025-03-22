@@ -4,6 +4,8 @@ import Home from "./pages/Home/Home";
 import Register from "./pages/Registration/Registration";
 import Login from "./pages/Login/Login";
 import Profile from "./pages/Profile/Profile";
+import WeightStatistic from "./pages/Weight_Statistic/WeightStatistic";
+import PersonalProducts from "./pages/My_Products/PersonalProducts";
 
 
 export default function App() {
@@ -14,6 +16,8 @@ export default function App() {
         <Route path="/registration" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/weight-statistic" element={<WeightStatistic />} />
+        <Route path="/my-products" element={<PersonalProducts />} />
       </Routes>
     </Router>
   );

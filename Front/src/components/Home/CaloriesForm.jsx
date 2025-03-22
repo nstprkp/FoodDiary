@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import LoadingSpinner from "./LoadingSpinner"; // Импортируем компонент спиннера
+import ErrorHandler from "../Default/ErrorHandler"; // Импортируем компонент для обработки ошибок
 import "./CaloriesForm.css";
 
 export default function CaloriesForm() {
@@ -11,16 +13,36 @@ export default function CaloriesForm() {
   const [activityLevel, setActivityLevel] = useState("");
   const [result, setResult] = useState(null);
   const [showResult, setShowResult] = useState(false);
+  const [loading, setLoading] = useState(false); // Состояние для загрузки
+  const [error, setError] = useState(null); // Состояние для ошибок
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Проверка на отрицательные значения
+    if (weight <= 0 || age <= 0 || height <= 0) {
+      setError("Вес, возраст и рост должны быть положительными числами.");
+      return;
+    }
+
+    // Проверка на заполнение всех полей
+    if (!weight || !age || !height || !gender || !aim || !activityLevel) {
+      setError("Пожалуйста, заполните все поля.");
+      return;
+    }
+
     const userData = { weight, age, height, gender, aim, activity_level: activityLevel };
 
     try {
+      setLoading(true); // Начинаем загрузку
+      const token = localStorage.getItem("access_token");
+
       const response = await fetch("http://localhost:8000/user/calculate_nutrients", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(userData),
       });
 
@@ -29,16 +51,33 @@ export default function CaloriesForm() {
         setResult(data);
         setShowResult(true); // Показываем результат с анимацией
       } else {
-        alert("Ошибка при расчёте данных.");
+        // Обработка ошибок от сервера
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Ошибка при расчёте данных.");
       }
     } catch (error) {
-      console.error("Ошибка при отправке данных:", error);
+      // Обработка ошибки "Failed to fetch"
+      if (error.message == "Failed to fetch") {
+        setError("Ошибка сети. Проверьте подключение к интернету.");
+      } else {
+        setError(error.message); // Устанавливаем сообщение об ошибке
+      }
+    } finally {
+      setLoading(false); // Загрузка завершена
     }
+  };
+
+  // Закрытие окна с ошибкой
+  const closeErrorHandler = () => {
+    setError(null);
   };
 
   return (
     <section className="calculate-nutrients-section">
       <h2 className="calculate-nutrients-title">Расчёт рекомендуемых КБЖУ</h2>
+
+      {/* Отображение ошибки */}
+      {error && <ErrorHandler error={error} onClose={closeErrorHandler} />}
 
       <div className="form-result-container">
         {/* Форма - сдвигается влево на одно расстояние от центра */}
@@ -122,6 +161,9 @@ export default function CaloriesForm() {
           </motion.div>
         )}
       </div>
+
+      {/* Отображение спиннера */}
+      {loading && <LoadingSpinner />}
     </section>
   );
 }

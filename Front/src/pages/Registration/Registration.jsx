@@ -3,17 +3,56 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./Registration.css";
 import { Link } from "react-router-dom"; // Импортируем Link для навигации
+import LoadingSpinner from "../../components/Default/LoadingSpinner"; // Импортируем LoadingSpinner
+import ErrorHandler from "../../components/Default/ErrorHandler"; // Импортируем ErrorHandler
 
 export default function Registration() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Состояние загрузки
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    // Проверка на русские символы в username
+    const russianRegex = /[а-яА-Я]/;
+    if (russianRegex.test(username)) {
+      setError("Логин не должен содержать русские символы.");
+      return;
+    }
+
+    if (russianRegex.test(email) ) {
+      setError("Адрес электронной почты не должен содержать русские символы.");
+      return;
+    }
+
+    if (russianRegex.test(password)) {
+      setError("Пароль не должен содержать русские символы.");
+      return;
+    }
+
+    // Проверка на пустые поля
+    if (!username || !email || !password) {
+      setError("Пожалуйста, заполните все поля.");
+      return;
+    }
+
+    // Проверка на валидность email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Пожалуйста, введите корректный email.");
+      return;
+    }
+
+    // Проверка на русские символы в password
+    if (russianRegex.test(password)) {
+      setError("Пароль не должен содержать русские символы.");
+      return;
+    }
 
     const userData = {
       login: username,
@@ -22,6 +61,7 @@ export default function Registration() {
     };
 
     try {
+      setIsLoading(true); // Включаем загрузку
       const response = await fetch("http://localhost:8000/auth/registration", {
         method: "POST",
         headers: {
@@ -31,7 +71,15 @@ export default function Registration() {
       });
 
       if (!response.ok) {
-        throw new Error("Ошибка при регистрации. Попробуйте снова.");
+        const errorData = await response.json();
+        // Обработка ошибок от сервера
+        if (errorData.detail === "User with this email already exists") {
+          throw new Error("Пользователь с таким email уже существует.");
+        } else if (errorData.detail === "User with this login already exists") {
+          throw new Error("Пользователь с таким логином уже существует.");
+        } else {
+          throw new Error("Ошибка при регистрации. Попробуйте снова.");
+        }
       }
 
       const data = await response.json();
@@ -39,8 +87,20 @@ export default function Registration() {
 
       navigate("/login"); // Перенаправление после успешной регистрации
     } catch (err) {
-      setError(err.message);
+      // Обработка ошибки "Failed to fetch"
+      if (err.message === "Failed to fetch") {
+        setError("Ошибка сети. Проверьте подключение к интернету.");
+      } else {
+        setError(err.message); // Устанавливаем сообщение об ошибке
+      }
+    } finally {
+      setIsLoading(false); // Выключаем загрузку
     }
+  };
+
+  // Закрытие окна с ошибкой
+  const closeErrorHandler = () => {
+    setError("");
   };
 
   return (
@@ -50,6 +110,12 @@ export default function Registration() {
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
     >
+      {/* Отображение спиннера */}
+      {isLoading && <LoadingSpinner />}
+
+      {/* Отображение ошибки */}
+      {error && <ErrorHandler error={error} onClose={closeErrorHandler} />}
+
       <motion.h1
         className="registration-title"
         initial={{ opacity: 0 }}
@@ -58,17 +124,6 @@ export default function Registration() {
       >
         Создайте аккаунт
       </motion.h1>
-
-      {error && (
-        <motion.p
-          className="error-message"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-        >
-          {error}
-        </motion.p>
-      )}
 
       <motion.form
         className="registration-form"
@@ -113,6 +168,7 @@ export default function Registration() {
         <motion.button
           type="submit"
           className="registration-btn"
+          disabled={isLoading} // Блокируем кнопку при загрузке
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.5 }}
