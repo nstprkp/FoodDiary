@@ -1,4 +1,6 @@
 from datetime import date, timedelta, datetime
+
+import asyncio
 from fastapi import HTTPException, status
 from sqlalchemy import select, and_, delete
 from sqlalchemy.exc import IntegrityError
@@ -14,7 +16,7 @@ from src.services.meal_products_service import update_meal_product, delete_meal_
 from src.services.product_service import recalculate_product_nutrients
 
 # Пересчитывает нутриенты для блюда на основе продуктов
-async def recalculate_meal_nutrients(meal: Meal):
+async def recalculate_meal_nutrients(db: AsyncSession, meal: Meal):
     logger.info(f"Recalculating nutrients for meal {meal.id} ({meal.name})")
     total_weight = 0
     total_calories = 0
@@ -23,8 +25,10 @@ async def recalculate_meal_nutrients(meal: Meal):
     total_carbohydrates = 0
     products = []
 
+    await db.refresh(meal, attribute_names=["meal_products"])
+
     for meal_product in meal.meal_products:
-        db_product = meal_product.product
+        db_product = await db.get(Product, meal_product.product_id)
         logger.info(f"PRODUCT - {db_product}")
         if not db_product:
             logger.warning(f"Product with id {meal_product.product_id} not found in the database.")
@@ -96,9 +100,19 @@ async def add_meal(db: AsyncSession, meal: MealCreate, user_id: int):
             db.add(meal_product)
 
         await db.commit()
+        await db.refresh(db_meal)
+        await asyncio.gather(
+            cache.delete(f"user_meals:{user_id}"),
+            cache.delete(f"user_meals_products:{user_id}:{db_meal.recorded_at}"),
+            cache.delete(f"user_meal:{user_id}:{db_meal.id}"),
+            cache.delete(f"user_meals:{user_id}:{db_meal.recorded_at}"),
+            cache.delete(f"personal_products:{user_id}"),
+            cache.delete(f"user_meals_history:{user_id}")
+        )
+
         logger.info(f"Meal {meal.name} with products successfully saved to the database.")
 
-        meal_pydantic = await recalculate_meal_nutrients(db_meal)
+        meal_pydantic = await recalculate_meal_nutrients(db, db_meal)
         return meal_pydantic
 
     except IntegrityError:
@@ -146,7 +160,7 @@ async def get_user_meals_with_products_by_date(db: AsyncSession, user_id: int, t
     result = await db.execute(query)
     meals = result.scalars().unique().all()
 
-    formatted_meals = [await recalculate_meal_nutrients(meal) for meal in meals]
+    formatted_meals = [await recalculate_meal_nutrients(db, meal) for meal in meals]
 
     await cache.set(cache_key, [meal.model_dump(mode="json") for meal in formatted_meals], expire=3600)
     logger.info(f"Meals for user {user_id} on {target_date} cached successfully.")
@@ -273,12 +287,17 @@ async def update_meal(db: AsyncSession, meal_update: MealUpdate, meal_id: int, u
         logger.error(f"Meal {meal_id} not found after update.")
         raise HTTPException(status_code=500, detail="Meal not found after update")
 
-    updated_meal = await recalculate_meal_nutrients(db_meal)
+    updated_meal = await recalculate_meal_nutrients(db, db_meal)
     await db.commit()
 
-    await cache.delete(f"user_meals:{user_id}")
-    if db_meal.recorded_at:
-        await cache.delete(f"user_meals:{user_id}:{db_meal.recorded_at}")
+    await asyncio.gather(
+        cache.delete(f"user_meals:{user_id}"),
+        cache.delete(f"user_meals_products:{user_id}:{db_meal.recorded_at}"),
+        cache.delete(f"user_meal:{user_id}:{db_meal.id}"),
+        cache.delete(f"user_meals:{user_id}:{db_meal.recorded_at}"),
+        cache.delete(f"personal_products:{user_id}"),
+        cache.delete(f"user_meals_history:{user_id}")
+    )
 
     logger.info(f"Meal {meal_id} for user {user_id} cache deleted.")
     return updated_meal
@@ -301,7 +320,12 @@ async def delete_meal(db: AsyncSession, meal_id: int, user_id: int):
     await db.delete(db_meal)
     await db.commit()
     logger.info(f"Meal {meal_id} for user {user_id} deleted successfully.")
-    await cache.delete(f"user_meals:{user_id}")
-    if db_meal.recorded_at:
-        await cache.delete(f"user_meals:{user_id}:{db_meal.recorded_at}")
+    await asyncio.gather(
+        cache.delete(f"user_meals:{user_id}"),
+        cache.delete(f"user_meals_products:{user_id}:{db_meal.recorded_at}"),
+        cache.delete(f"user_meal:{user_id}:{db_meal.id}"),
+        cache.delete(f"user_meals:{user_id}:{db_meal.recorded_at}"),
+        cache.delete(f"personal_products:{user_id}"),
+        cache.delete(f"user_meals_history:{user_id}")
+    )
     return {"message": "Meal and its products deleted successfully"}

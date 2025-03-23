@@ -142,3 +142,47 @@
   .personal-product-modal-footer button:last-child:hover {
     background-color: #6d28d9;
   }
+
+  /* Загрузка фото */
+.photo-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.photo-upload-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+  color: black;
+  background-color: #dfdfdf;
+  cursor: pointer;
+  width: 100%;
+  max-width: 340px;
+  transition: all 0.2s ease;
+}
+
+.photo-upload-button:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.photo-upload-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.upload-icon {
+  color: black;
+}
+
+.photo-upload-note {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}

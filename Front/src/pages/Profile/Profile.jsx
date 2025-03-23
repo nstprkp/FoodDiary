@@ -93,7 +93,7 @@ export default function Profile() {
   const fetchProfilePicture = async () => {
     try {
       const token = localStorage.getItem("access_token")
-      const response = await fetch("http://localhost:8000/photo/profile-picture", {
+      const response = await fetch("http://localhost:8000/user/profile-picture", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -129,7 +129,7 @@ export default function Profile() {
       const formData = new FormData();
       formData.append("file", file);
   
-      const response = await fetch("http://localhost:8000/photo/upload-profile-picture", {
+      const response = await fetch("http://localhost:8000/user/upload-profile-picture", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

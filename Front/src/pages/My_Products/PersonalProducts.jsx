@@ -3,24 +3,25 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Header from "../../components/Default/Header";
 import Menu from "../../components/Default/Menu";
-import ProductModal from "../../components/Personal_Products/ProductModal";
+import AddProductModal from "../../components/Personal_Products/AddProductModal";
+import EditProductModal from "../../components/Personal_Products/EditProductModal";
 import ProductItem from "../../components/Personal_Products/ProductItem";
-import ErrorWithRetry from "../../components/Default/ErrorWithRetry"; // Импортируем компонент для обработки ошибок
-import LoadingSpinner from "../../components/Default/LoadingSpinner"; // Импортируем компонент для анимации загрузки
-import { checkAuth } from "../../utils/auth"; // Импортируем функцию проверки авторизации
+import ErrorWithRetry from "../../components/Default/ErrorWithRetry";
+import LoadingSpinner from "../../components/Default/LoadingSpinner";
+import { checkAuth } from "../../utils/auth";
 import "./PersonalProducts.css";
 
 export default function PersonalProducts() {
   const [products, setProducts] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false); // Для добавления продукта
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Для редактирования продукта
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const [userData, setUserData] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // Состояние для ошибок
+  const [error, setError] = useState(null);
 
-  // Проверка авторизации и загрузка данных
   useEffect(() => {
     if (!checkAuth()) {
       setError("Неавторизованный доступ");
@@ -42,7 +43,6 @@ export default function PersonalProducts() {
     fetchData();
   }, []);
 
-  // Загрузка данных пользователя
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem("access_token");
@@ -65,11 +65,10 @@ export default function PersonalProducts() {
     }
   };
 
-  // Загрузка фото профиля
   const fetchProfilePicture = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch("http://localhost:8000/photo/profile-picture", {
+      const response = await fetch("http://localhost:8000/user/profile-picture", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -84,7 +83,6 @@ export default function PersonalProducts() {
     }
   };
 
-  // Загрузка личных продуктов
   const fetchProducts = async () => {
     try {
       const token = localStorage.getItem("access_token");
@@ -100,44 +98,58 @@ export default function PersonalProducts() {
       }
 
       const data = await response.json();
-      setProducts(data);
+
+      const productsWithImages = await Promise.all(
+        data.map(async (product) => {
+          if (product.has_picture) {
+            try {
+              const imageResponse = await fetch(
+                `http://localhost:8000/product/product-picture/${product.id}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              );
+
+              if (imageResponse.ok) {
+                const blob = await imageResponse.blob();
+                const imageUrl = URL.createObjectURL(blob);
+                return { ...product, picture: imageUrl };
+              }
+            } catch (error) {
+              console.error("Ошибка при загрузке изображения продукта:", error);
+            }
+          }
+          return { ...product, picture: null };
+        })
+      );
+
+      setProducts(productsWithImages);
     } catch (error) {
       throw new Error(error.message);
     }
   };
 
-  const handleSaveProduct = (savedProduct) => {
-    if (savedProduct.id) {
-      // Если продукт новый, добавляем его в список
-      setProducts((prevProducts) => [...prevProducts, savedProduct]);
-    } else {
-      // Если продукт редактируется, обновляем его в списке
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === savedProduct.id ? savedProduct : product
-        )
-      );
+  const handleSaveProduct = async (savedProduct) => {
+    try {
+      await fetchProducts();
+    } catch (error) {
+      setError(error.message);
     }
   };
 
-  // Открытие модального окна
-  const openModal = (product = null) => {
+  const openAddModal = () => {
+    setIsAddModalOpen(true);
+  };
+
+  const openEditModal = (product) => {
     setSelectedProduct(product);
-    setIsModalOpen(true);
+    setIsEditModalOpen(true);
   };
 
-  // Закрытие модального окна
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedProduct(null);
-    fetchProducts();
-  };
-
-  // Удаление продукта
   const handleDelete = async (productId) => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch(`http://localhost:8000/product/delete/${(productId)}`, {
+      const response = await fetch(`http://localhost:8000/product/delete/${productId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -148,13 +160,12 @@ export default function PersonalProducts() {
         throw new Error("Не удалось удалить продукт");
       }
 
-      fetchProducts();
+      await fetchProducts();
     } catch (error) {
       setError(error.message);
     }
   };
 
-  // Выход из системы
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem("access_token");
@@ -171,13 +182,11 @@ export default function PersonalProducts() {
     }
   };
 
-  // Получение полного имени
   const getFullName = (user) => {
     if (!user) return "";
     return [user.firstname, user.lastname].filter(Boolean).join(" ") || user.login;
   };
 
-  // Перевод значений на русский
   const translateValue = (value, category) => {
     const translations = {
       gender: { male: "Мужской", female: "Женский", other: "Другой" },
@@ -193,7 +202,6 @@ export default function PersonalProducts() {
     return translations[category]?.[value] || value || "—";
   };
 
-  // Если есть ошибка, отображаем компонент ErrorHandler
   if (error && !products.length) {
     return (
       <ErrorWithRetry
@@ -208,7 +216,6 @@ export default function PersonalProducts() {
     );
   }
 
-  // Если данные загружаются, отображаем анимацию загрузки
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -233,7 +240,7 @@ export default function PersonalProducts() {
       <div className="personal-products-content">
         <div className="personal-products-header">
           <h2>Мои продукты</h2>
-          <button onClick={() => openModal()} className="personal-products-add-product-button">
+          <button onClick={openAddModal} className="personal-products-add-product-button">
             Добавить продукт
           </button>
         </div>
@@ -243,19 +250,28 @@ export default function PersonalProducts() {
             <ProductItem
               key={product.id}
               product={product}
-              onEdit={openModal}
+              onEdit={openEditModal}
               onDelete={handleDelete}
             />
           ))}
         </div>
       </div>
 
-      {isModalOpen && (
-        <ProductModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
+      {isAddModalOpen && (
+        <AddProductModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onSave={handleSaveProduct}
+        />
+      )}
+
+      {isEditModalOpen && (
+        <EditProductModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
           product={selectedProduct}
           onSave={handleSaveProduct}
+          onDelete={handleDelete} // Передаем функцию удаления
         />
       )}
     </motion.div>

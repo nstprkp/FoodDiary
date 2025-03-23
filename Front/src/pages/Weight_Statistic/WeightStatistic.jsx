@@ -148,7 +148,7 @@ export default function WeightStatistic() {
   const fetchProfilePicture = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch("http://localhost:8000/photo/profile-picture", {
+      const response = await fetch("http://localhost:8000/user/profile-picture", {
         headers: { Authorization: `Bearer ${token}` },
       });
   
