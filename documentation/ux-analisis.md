@@ -34,10 +34,10 @@
 ## 4. До и после: визуальное сравнение
 
 ### **Страница профиля до:**
-[!Страница профиля до](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/profile-before.png)
+![Страница профиля до](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/profile-before.png)
 
 ### **После:**
-[!Страница профиля после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/profile-after.png)
+![Страница профиля после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/profile-after.png)
 
 ## 5. Оформление отчёта
 
