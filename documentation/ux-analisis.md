@@ -33,11 +33,25 @@
 
 ## 4. До и после: визуальное сравнение
 
-### **Страница профиля до:**
+Всем страницам добавлен одинаковый стиль в фиолетовых оттенках. Ниже приведено несколько примеров улучшения интерфейса.
+
+### Главная страница до:
+![Главная страница до](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/home-before.png)
+
+### Главная страница после:
+![Главная страница после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/home-after.png)
+
+### Страница профиля до:
 ![Страница профиля до](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/profile-before.png)
 
-### **После:**
+### Страница профиля после:
 ![Страница профиля после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/profile-after.png)
 
-## 5. Оформление отчёта
+### Страница статистики веса до:
+![Страница статистики веса до](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/weight-statistic-before.png)
 
+### Страница статистики веса после:
+![Страница статистики веса после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/weight-statistic-after.png)
+
+### Добавление уведомлений о некорректном вводе
+![Уведомление о неверно введенном логине или пароле](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/wrong-pass-login.png)
