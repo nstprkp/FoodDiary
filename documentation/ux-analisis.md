@@ -42,17 +42,22 @@
 #### Главная страница после:
 ![Главная страница после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/home-after.png)
 
-### Страница профиля до:
+### 4.2 Страница профиля 
+#### Страница профиля до:
 ![Страница профиля до](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/profile-before.png)
 
-### Страница профиля после:
+#### Страница профиля после:
 ![Страница профиля после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/profile-after.png)
 
-### Страница статистики веса до:
+### 4.3 Страница статистики веса 
+#### Страница статистики веса до:
 ![Страница статистики веса до](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/weight-statistic-before.png)
 
-### Страница статистики веса после:
+#### Страница статистики веса после:
 ![Страница статистики веса после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/weight-statistic-after.png)
 
-### Добавление уведомлений о некорректном вводе
+### 4.4 Добавление уведомлений о некорректном вводе
 ![Уведомление о неверно введенном логине или пароле](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/wrong-pass-login.png)
+
+### 4.5 Добавление модальных окон для уменьшения количества переходов между страницами
+![Присер модального окна](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/modal-window-profile.png)
