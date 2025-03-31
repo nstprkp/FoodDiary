@@ -48,6 +48,7 @@
 
 #### Страница профиля после:
 ![Страница профиля после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/profile-after.png)
+![Страница профиля после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/profile-after2.png)
 
 ### 4.3 Страница статистики веса 
 #### Страница статистики веса до:
