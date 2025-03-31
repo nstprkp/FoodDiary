@@ -57,8 +57,15 @@
 #### Страница статистики веса после:
 ![Страница статистики веса после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/weight-statistic-after.png)
 
-### 4.4 Добавление уведомлений о некорректном вводе
+### 4.4 Страница приемов пищи
+#### Страница приемов пищи до:
+![Страница статистики приемов пищи до](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/meals-before.png)
+
+#### ССтраница приемов пищи после:
+![Страница приемов пищи после](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/meals-after.png)
+
+### 4.5 Добавление уведомлений о некорректном вводе
 ![Уведомление о неверно введенном логине или пароле](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/wrong-pass-login.png)
 
-### 4.5 Добавление модальных окон для уменьшения количества переходов между страницами
+### 4.6 Добавление модальных окон для уменьшения количества переходов между страницами
 ![Присер модального окна](https://github.com/nstprkp/FoodDiary/blob/main/documentation/pictures/modal-window-profile.png)
