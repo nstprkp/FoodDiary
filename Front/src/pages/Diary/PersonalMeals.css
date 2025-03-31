@@ -131,3 +131,31 @@
     margin: 15px 0;
   }
 }
+
+/* Стили для date-picker */
+.date-picker {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-picker label {
+    font-size: 1rem;
+    color: white;
+}
+
+.date-picker input {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: black; /* Черный цвет текста по умолчанию */
+    cursor: pointer;
+}
+
+/* Стиль для дат вне диапазона */
+.date-picker input.out-of-range {
+    color: #9ca3af; /* Серый цвет текста */
+}

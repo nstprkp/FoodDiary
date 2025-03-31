@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import "./MealModal.css";
 import { API_BASE_URL } from '../../config';
-
+import LoadingSpinner from "../Default/LoadingSpinner";
+import ErrorHandler from "../Default/ErrorHandler";
 
 const EditMealModal = ({ isOpen, onClose, meal, onUpdate, onDelete }) => {
   const [name, setName] = useState(meal?.name || "");
@@ -20,6 +21,9 @@ const EditMealModal = ({ isOpen, onClose, meal, onUpdate, onDelete }) => {
     })) || []
   );
   const [isSearching, setIsSearching] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState(null);
 
   const searchProducts = async (query) => {
     if (!query.trim()) {
@@ -29,15 +33,31 @@ const EditMealModal = ({ isOpen, onClose, meal, onUpdate, onDelete }) => {
     setIsSearching(true);
     try {
       const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Требуется авторизация. Пожалуйста, войдите снова.");
+      }
+
       const response = await fetch(
         `${API_BASE_URL}/product/search?query=${encodeURIComponent(query)}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      if (!response.ok) throw new Error("Ошибка при поиске продуктов");
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Сервер не отвечает. Попробуйте позже.");
+      }
+      
       const data = await response.json();
       setSearchResults(data);
+      setError(null);
     } catch (error) {
       console.error("Ошибка поиска:", error);
+      setError(
+        error.message === "Failed to fetch" 
+          ? "Не удалось найти продукты. Проверьте интернет-соединение."
+          : error.message
+      );
+      setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
@@ -65,12 +85,12 @@ const EditMealModal = ({ isOpen, onClose, meal, onUpdate, onDelete }) => {
 
   const handleUpdate = async () => {
     if (!name.trim()) {
-      alert("Пожалуйста, укажите название приёма пищи");
+      setError("Укажите название приёма пищи");
       return;
     }
 
     if (selectedProducts.length === 0) {
-      alert("Пожалуйста, добавьте хотя бы один продукт");
+      setError("Добавьте хотя бы один продукт");
       return;
     }
 
@@ -95,7 +115,14 @@ const EditMealModal = ({ isOpen, onClose, meal, onUpdate, onDelete }) => {
     };
 
     try {
+      setIsSaving(true);
+      setError(null);
+      
       const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Сессия истекла. Пожалуйста, войдите снова.");
+      }
+
       const response = await fetch(`${API_BASE_URL}/meal/${meal.id}`, {
         method: "PUT",
         headers: {
@@ -104,25 +131,53 @@ const EditMealModal = ({ isOpen, onClose, meal, onUpdate, onDelete }) => {
         },
         body: JSON.stringify(mealData)
       });
-      if (!response.ok) throw new Error("Ошибка при обновлении");
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.detail || 
+          "Не удалось обновить данные. Попробуйте позже."
+        );
+      }
+      
       const updatedMeal = await response.json();
       onUpdate(updatedMeal);
       onClose();
     } catch (error) {
       console.error("Ошибка обновления:", error);
-      alert("Не удалось обновить приём пищи");
+      setError(
+        error.message === "Failed to fetch"
+          ? "Не удалось соединиться с сервером. Проверьте интернет."
+          : error.message
+      );
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Вы уверены, что хотите удалить этот приём пищи?")) {
-      try {
-        await onDelete(meal.id);
-        onClose();
-      } catch (error) {
-        console.error("Ошибка удаления:", error);
-        alert("Не удалось удалить приём пищи");
+    if (!window.confirm("Вы уверены, что хотите удалить этот приём пищи?")) return;
+
+    try {
+      setIsDeleting(true);
+      setError(null);
+      
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Требуется авторизация для удаления.");
       }
+
+      await onDelete(meal.id);
+      onClose();
+    } catch (error) {
+      console.error("Ошибка удаления:", error);
+      setError(
+        error.message === "Failed to fetch"
+          ? "Не удалось удалить приём пищи. Нет соединения с сервером."
+          : error.message
+      );
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -137,6 +192,12 @@ const EditMealModal = ({ isOpen, onClose, meal, onUpdate, onDelete }) => {
             ×
           </button>
         </div>
+
+        {error && (
+          <div className="meal-modal-error">
+            <ErrorHandler error={error} onClose={() => setError(null)} />
+          </div>
+        )}
 
         <div className="meal-modal-form-group">
           <label>Название:</label>
@@ -160,7 +221,9 @@ const EditMealModal = ({ isOpen, onClose, meal, onUpdate, onDelete }) => {
             placeholder="Введите название продукта"
           />
           {isSearching ? (
-            <p className="diary-loading-text">Поиск...</p>
+            <div className="meal-modal-loading">
+              <LoadingSpinner small />
+            </div>
           ) : searchResults.length > 0 ? (
             <ul className="search-results">
               {searchResults.map((product) => (
@@ -208,12 +271,18 @@ const EditMealModal = ({ isOpen, onClose, meal, onUpdate, onDelete }) => {
         </div>
 
         <div className="meal-modal-footer">
-          <button className="delete-button" onClick={handleDelete}>
-            Удалить приём пищи
+          <button 
+            className="delete-button" 
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
+            {isDeleting ? <LoadingSpinner small white /> : "Удалить приём пищи"}
           </button>
           <div className="action-buttons">
             <button onClick={onClose}>Отмена</button>
-            <button onClick={handleUpdate}>Сохранить</button>
+            <button onClick={handleUpdate} disabled={isSaving}>
+              {isSaving ? <LoadingSpinner small white /> : "Сохранить"}
+            </button>
           </div>
         </div>
       </div>

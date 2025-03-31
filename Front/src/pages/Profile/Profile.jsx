@@ -344,7 +344,6 @@ export default function Profile() {
           setLoading(true);
           fetchUserProfile();
         }}
-        onBack={() => (window.location.href = "/login")}
       />
     );
   }

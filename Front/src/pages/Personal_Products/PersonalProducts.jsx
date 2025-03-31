@@ -12,11 +12,10 @@ import { checkAuth } from "../../utils/auth";
 import "./PersonalProducts.css";
 import { API_BASE_URL } from '../../config';
 
-
 export default function PersonalProducts() {
   const [products, setProducts] = useState([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false); // Для добавления продукта
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Для редактирования продукта
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -26,17 +25,19 @@ export default function PersonalProducts() {
 
   useEffect(() => {
     if (!checkAuth()) {
-      setError("Неавторизованный доступ");
+      setError("Неавторизованный доступ. Пожалуйста, войдите в систему.");
       setLoading(false);
       return;
     }
 
     const fetchData = async () => {
       try {
+        setLoading(true);
+        setError(null);
         await fetchUserProfile();
         await fetchProducts();
       } catch (error) {
-        setError(error.message);
+        handleFetchError(error);
       } finally {
         setLoading(false);
       }
@@ -45,25 +46,42 @@ export default function PersonalProducts() {
     fetchData();
   }, []);
 
+  const handleFetchError = (error) => {
+    let errorMessage = error.message;
+    
+    if (error.message === "Failed to fetch") {
+      errorMessage = "Ошибка сети. Проверьте подключение к интернету.";
+    } else if (error.message.includes("Unauthorized")) {
+      errorMessage = "Сессия истекла. Пожалуйста, войдите снова.";
+    }
+
+    setError(errorMessage);
+  };
+
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Требуется авторизация");
+      }
+
       const response = await fetch(`${API_BASE_URL}/user/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
-        throw new Error("Не удалось загрузить данные пользователя");
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Не удалось загрузить данные пользователя");
       }
 
       const data = await response.json();
       setUserData(data);
 
       if (data.has_profile_picture) {
-        fetchProfilePicture();
+        await fetchProfilePicture();
       }
     } catch (error) {
-      throw new Error(error.message);
+      throw error;
     }
   };
 
@@ -81,91 +99,93 @@ export default function PersonalProducts() {
         setProfilePicture(imageUrl);
       }
     } catch (error) {
-      setError("Ошибка при получении фото профиля");
+      console.error("Ошибка при загрузке фото профиля:", error);
     }
   };
 
   const fetchProducts = async () => {
     try {
       const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Требуется авторизация");
+      }
+
       const response = await fetch(`${API_BASE_URL}/product/my-products`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
-        throw new Error("Не удалось загрузить продукты");
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Не удалось загрузить список продуктов");
       }
 
       const data = await response.json();
 
       const productsWithImages = await Promise.all(
         data.map(async (product) => {
-          if (product.has_picture) {
-            try {
-              const imageResponse = await fetch(
-                `${API_BASE_URL}/product/product-picture/${product.id}`,
-                {
-                  headers: { Authorization: `Bearer ${token}` },
-                }
-              );
+          if (!product.has_picture) return { ...product, picture: null };
 
-              if (imageResponse.ok) {
-                const blob = await imageResponse.blob();
-                const imageUrl = URL.createObjectURL(blob);
-                return { ...product, picture: imageUrl };
-              }
-            } catch (error) {
-              console.error("Ошибка при загрузке изображения продукта:", error);
+          try {
+            const imageResponse = await fetch(
+              `${API_BASE_URL}/product/product-picture/${product.id}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            if (imageResponse.ok) {
+              const blob = await imageResponse.blob();
+              return { ...product, picture: URL.createObjectURL(blob) };
             }
+            return { ...product, picture: null };
+          } catch (error) {
+            console.error("Ошибка загрузки изображения продукта:", error);
+            return { ...product, picture: null };
           }
-          return { ...product, picture: null };
         })
       );
 
       setProducts(productsWithImages);
     } catch (error) {
-      throw new Error(error.message);
+      throw error;
     }
   };
 
   const handleSaveProduct = async (savedProduct) => {
     try {
+      setLoading(true);
       await fetchProducts();
     } catch (error) {
-      setError(error.message);
+      handleFetchError(error);
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
-  };
-
-  const openEditModal = (product) => {
-    setSelectedProduct(product);
-    setIsEditModalOpen(true);
   };
 
   const handleDelete = async (productId) => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE_URL}/product/delete/${productId}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
-        throw new Error("Не удалось удалить продукт");
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Не удалось удалить продукт");
       }
 
       await fetchProducts();
     } catch (error) {
-      setError(error.message);
+      handleFetchError(error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const openAddModal = () => setIsAddModalOpen(true);
+  const openEditModal = (product) => {
+    setSelectedProduct(product);
+    setIsEditModalOpen(true);
   };
 
   const handleLogout = async () => {
@@ -178,7 +198,7 @@ export default function PersonalProducts() {
       localStorage.removeItem("access_token");
       window.location.href = "/login";
     } catch (error) {
-      setError("Ошибка при выходе");
+      console.error("Ошибка при выходе:", error);
       localStorage.removeItem("access_token");
       window.location.href = "/login";
     }
@@ -204,22 +224,32 @@ export default function PersonalProducts() {
     return translations[category]?.[value] || value || "—";
   };
 
-  if (error && !products.length) {
+  if (loading && !error) {
+    return <LoadingSpinner />;
+  }
+
+  if (error && !userData) {
     return (
       <ErrorWithRetry
         error={error}
         onRetry={() => {
           setError(null);
           setLoading(true);
-          fetchProducts();
+          // Вызываем полную перезагрузку данных, а не только продуктов
+          const fetchData = async () => {
+            try {
+              await fetchUserProfile();
+              await fetchProducts();
+            } catch (error) {
+              handleFetchError(error);
+            } finally {
+              setLoading(false);
+            }
+          };
+          fetchData();
         }}
-        onBack={() => (window.location.href = "/login")}
       />
     );
-  }
-
-  if (loading) {
-    return <LoadingSpinner />;
   }
 
   return (
@@ -247,15 +277,27 @@ export default function PersonalProducts() {
           </button>
         </div>
 
+        {error && (
+          <div className="personal-products-error">
+            <ErrorHandler error={error} onClose={() => setError(null)} />
+          </div>
+        )}
+
         <div className="personal-products-list">
-          {products.map((product) => (
-            <ProductItem
-              key={product.id}
-              product={product}
-              onEdit={openEditModal}
-              onDelete={handleDelete}
-            />
-          ))}
+          {products.length > 0 ? (
+            products.map((product) => (
+              <ProductItem
+                key={product.id}
+                product={product}
+                onEdit={openEditModal}
+                onDelete={handleDelete}
+              />
+            ))
+          ) : (
+            <div className="no-products-message">
+              У вас пока нет добавленных продуктов
+            </div>
+          )}
         </div>
       </div>
 
@@ -273,7 +315,7 @@ export default function PersonalProducts() {
           onClose={() => setIsEditModalOpen(false)}
           product={selectedProduct}
           onSave={handleSaveProduct}
-          onDelete={handleDelete} // Передаем функцию удаления
+          onDelete={handleDelete}
         />
       )}
     </motion.div>

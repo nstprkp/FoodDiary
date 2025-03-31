@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import "./MealModal.css";
 import { API_BASE_URL } from '../../config';
+import LoadingSpinner from "../Default/LoadingSpinner";
+import ErrorHandler from "../Default/ErrorHandler";
 
 const MealModal = ({ isOpen, onClose, meal, onSave }) => {
   const [name, setName] = useState(meal?.name || "");
@@ -9,6 +11,8 @@ const MealModal = ({ isOpen, onClose, meal, onSave }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState(meal?.products || []);
   const [isSearching, setIsSearching] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (meal?.products) {
@@ -24,17 +28,32 @@ const MealModal = ({ isOpen, onClose, meal, onSave }) => {
     setIsSearching(true);
     try {
       const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Требуется авторизация. Пожалуйста, войдите снова.");
+      }
+
       const response = await fetch(
         `${API_BASE_URL}/product/search?query=${encodeURIComponent(query)}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      if (!response.ok) throw new Error("Ошибка при поиске продуктов");
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Сервер не отвечает. Попробуйте позже.");
+      }
+      
       const data = await response.json();
       setSearchResults(data);
+      setError(null);
     } catch (error) {
       console.error("Ошибка поиска:", error);
+      setError(
+        error.message === "Failed to fetch" 
+          ? "Не удалось подключиться к серверу. Проверьте интернет-соединение."
+          : error.message
+      );
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -63,12 +82,12 @@ const MealModal = ({ isOpen, onClose, meal, onSave }) => {
 
   const handleSave = async () => {
     if (!name.trim()) {
-      alert("Пожалуйста, укажите название приёма пищи");
+      setError("Укажите название приёма пищи");
       return;
     }
 
     if (selectedProducts.length === 0) {
-      alert("Пожалуйста, добавьте хотя бы один продукт");
+      setError("Добавьте хотя бы один продукт");
       return;
     }
 
@@ -94,7 +113,14 @@ const MealModal = ({ isOpen, onClose, meal, onSave }) => {
     };
 
     try {
+      setIsSaving(true);
+      setError(null);
+      
       const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Сессия истекла. Пожалуйста, войдите снова.");
+      }
+
       const url = meal?.id 
         ? `${API_BASE_URL}/meal/update/${meal.id}`
         : `${API_BASE_URL}/meal/add`;
@@ -109,13 +135,26 @@ const MealModal = ({ isOpen, onClose, meal, onSave }) => {
         body: JSON.stringify(mealData),
       });
 
-      if (!response.ok) throw new Error("Ошибка при сохранении");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.detail || 
+          "Сервер вернул ошибку. Попробуйте позже или обратитесь в поддержку."
+        );
+      }
+      
       const savedMeal = await response.json();
       onSave(savedMeal);
       onClose();
     } catch (error) {
       console.error("Ошибка сохранения:", error);
-      alert("Не удалось сохранить приём пищи");
+      setError(
+        error.message === "Failed to fetch"
+          ? "Не удалось сохранить данные. Проверьте подключение к интернету."
+          : error.message
+      );
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -130,6 +169,12 @@ const MealModal = ({ isOpen, onClose, meal, onSave }) => {
             ×
           </button>
         </div>
+
+        {error && (
+          <div className="meal-modal-error">
+            <ErrorHandler error={error} onClose={() => setError(null)} />
+          </div>
+        )}
 
         <div className="meal-modal-form-group">
           <label>Название приёма пищи *</label>
@@ -154,7 +199,9 @@ const MealModal = ({ isOpen, onClose, meal, onSave }) => {
             placeholder="Начните вводить название продукта"
           />
           {isSearching ? (
-            <p className="diary-loading-text">Поиск...</p>
+            <div className="meal-modal-loading">
+              <LoadingSpinner small />
+            </div>
           ) : searchResults.length > 0 ? (
             <ul className="search-results">
               {searchResults.map((product) => (
@@ -206,7 +253,9 @@ const MealModal = ({ isOpen, onClose, meal, onSave }) => {
 
         <div className="meal-modal-footer">
           <button onClick={onClose}>Отмена</button>
-          <button onClick={handleSave}>Сохранить</button>
+          <button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? <LoadingSpinner small white /> : "Сохранить"}
+          </button>
         </div>
       </div>
     </div>

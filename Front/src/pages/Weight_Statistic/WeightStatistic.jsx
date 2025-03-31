@@ -246,7 +246,6 @@ export default function WeightStatistic() {
           setLoading(true);
           fetchUserProfile();
         }}
-        onBack={() => (window.location.href = "/login")}
       />
     );
   }

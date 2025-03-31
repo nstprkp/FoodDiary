@@ -8,6 +8,7 @@ import EditMealModal from "../../components/Personal_Meals/EditMealModal";
 import MealItem from "../../components/Personal_Meals/MealItem";
 import ErrorHandler from "../../components/Default/ErrorHandler";
 import LoadingSpinner from "../../components/Default/LoadingSpinner";
+import ErrorWithRetry from "../../components/Default/ErrorWithRetry";
 import { checkAuth } from "../../utils/auth";
 import { API_BASE_URL } from '../../config';
 import "./PersonalMeals.css";
@@ -22,14 +23,19 @@ export default function PersonalMeals() {
   const [profilePicture, setProfilePicture] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showError, setShowError] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const isCurrentDate = selectedDate === new Date().toISOString().split('T')[0];
+
+  // Простая реализация toast
+  const toast = {
+    toast: ({ title, description, variant }) => {
+      console.log(`${variant || "default"}: ${title} - ${description}`);
+    },
+  };
 
   useEffect(() => {
     if (!checkAuth()) {
       setError("Неавторизованный доступ. Пожалуйста, войдите в систему.");
-      setShowError(true);
       setLoading(false);
       return;
     }
@@ -38,14 +44,12 @@ export default function PersonalMeals() {
       try {
         setLoading(true);
         setError(null);
-        setShowError(false);
         await Promise.all([
           fetchUserProfile(),
           fetchMeals(selectedDate)
         ]);
       } catch (error) {
-        setError(error.message || "Произошла ошибка при загрузке данных");
-        setShowError(true);
+        handleFetchError(error);
       } finally {
         setLoading(false);
       }
@@ -53,6 +57,20 @@ export default function PersonalMeals() {
 
     fetchData();
   }, [selectedDate]);
+
+  const handleFetchError = (error) => {
+    // Обработка ошибки "Failed to fetch"
+    if (error.message === "Failed to fetch") {
+      setError("Ошибка сети. Проверьте подключение к интернету.");
+    } else {
+      setError(error.message || "Произошла неизвестная ошибка");
+    }
+    toast.toast({
+      variant: "destructive",
+      title: "Ошибка",
+      description: error.message,
+    });
+  };
 
   const fetchUserProfile = async () => {
     try {
@@ -65,7 +83,8 @@ export default function PersonalMeals() {
       });
 
       if (!response.ok) {
-        throw new Error("Не удалось загрузить данные пользователя");
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Не удалось загрузить данные пользователя");
       }
 
       const data = await response.json();
@@ -108,7 +127,8 @@ export default function PersonalMeals() {
       });
   
       if (!response.ok) {
-        throw new Error("Не удалось загрузить приёмы пищи");
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Не удалось загрузить приёмы пищи");
       }
   
       const data = await response.json();
@@ -121,19 +141,23 @@ export default function PersonalMeals() {
 
   const handleSaveMeal = async (savedMeal) => {
     try {
+      setLoading(true);
       await fetchMeals(selectedDate);
     } catch (error) {
-      setError("Ошибка при обновлении данных");
-      setShowError(true);
+      handleFetchError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdateMeal = async (updatedMeal) => {
     try {
+      setLoading(true);
       await fetchMeals(selectedDate);
     } catch (error) {
-      setError("Ошибка при обновлении данных");
-      setShowError(true);
+      handleFetchError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -148,17 +172,32 @@ export default function PersonalMeals() {
 
   const closeAddModal = async () => {
     setIsAddModalOpen(false);
-    await fetchMeals(selectedDate);
+    try {
+      setLoading(true);
+      await fetchMeals(selectedDate);
+    } catch (error) {
+      handleFetchError(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const closeEditModal = async () => {
     setIsEditModalOpen(false);
     setSelectedMeal(null);
-    await fetchMeals(selectedDate);
+    try {
+      setLoading(true);
+      await fetchMeals(selectedDate);
+    } catch (error) {
+      handleFetchError(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (mealId) => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE_URL}/meal/${mealId}`, {
         method: "DELETE",
@@ -168,13 +207,19 @@ export default function PersonalMeals() {
       });
   
       if (!response.ok) {
-        throw new Error("Не удалось удалить приём пищи");
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Не удалось удалить приём пищи");
       }
     
       await fetchMeals(selectedDate);
+      toast.toast({
+        title: "Успешно",
+        description: "Приём пищи успешно удалён",
+      });
     } catch (error) {
-      setError(error.message);
-      setShowError(true);
+      handleFetchError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -186,9 +231,13 @@ export default function PersonalMeals() {
         headers: { Authorization: `Bearer ${token}` },
       });
       localStorage.removeItem("access_token");
+      toast.toast({
+        title: "Выход выполнен",
+        description: "Вы успешно вышли из аккаунта",
+      });
       window.location.href = "/login";
     } catch (error) {
-      setError("Ошибка при выходе");
+      console.error("Ошибка при выходе:", error);
       localStorage.removeItem("access_token");
       window.location.href = "/login";
     }
@@ -197,20 +246,6 @@ export default function PersonalMeals() {
   const getFullName = (user) => {
     if (!user) return "";
     return [user.firstname, user.lastname].filter(Boolean).join(" ") || user.login;
-  };
-
-  const handleCloseError = () => {
-    setShowError(false);
-    if (error.includes("Неавторизованный доступ")) {
-      window.location.href = "/login";
-    }
-  };
-
-  const handleRetry = () => {
-    setError(null);
-    setShowError(false);
-    setLoading(true);
-    fetchMeals(selectedDate);
   };
 
   const translateValue = (value, category) => {
@@ -239,7 +274,7 @@ export default function PersonalMeals() {
     return translations[category] && translations[category][value] ? translations[category][value] : value
   }
 
-  if (loading) {
+  if (loading && !error) {
     return (
       <div className="full-page-loading">
         <LoadingSpinner />
@@ -247,15 +282,25 @@ export default function PersonalMeals() {
     );
   }
 
-  if (showError) {
+  if (error && !userData) {
     return (
-      <div className="full-page-error">
-        <ErrorHandler 
-          error={error} 
-          onClose={handleCloseError}
-          onRetry={!error.includes("Неавторизованный доступ") ? handleRetry : null}
-        />
-      </div>
+      <ErrorWithRetry
+        error={error}
+        onRetry={async () => {
+          setError(null);
+          setLoading(true);
+          try {
+            await Promise.all([
+              fetchUserProfile(),
+              fetchMeals(selectedDate)
+            ]);
+          } catch (error) {
+            handleFetchError(error);
+          } finally {
+            setLoading(false);
+          }
+        }}
+      />
     );
   }
 
@@ -299,6 +344,8 @@ export default function PersonalMeals() {
             Добавить приём пищи
           </button>
         </div>
+
+        {error && <ErrorHandler error={error} onClose={() => setError(null)} />}
 
         <div className="personal-meals-list">
           {meals.length > 0 ? (

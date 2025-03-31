@@ -20,6 +20,17 @@ export default function AddProductModal({ isOpen, onClose, product, onSave }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Валидация данных
+    if (!name.trim()) {
+      setError("Укажите название продукта");
+      return;
+    }
+
+    if (!calories || !proteins || !fats || !carbohydrates || !weight) {
+      setError("Заполните все числовые поля");
+      return;
+    }
+
     const productData = {
       name,
       calories: parseFloat(calories),
@@ -36,6 +47,10 @@ export default function AddProductModal({ isOpen, onClose, product, onSave }) {
       setError(null);
 
       const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Требуется авторизация. Пожалуйста, войдите снова.");
+      }
+
       const response = await fetch(`${API_BASE_URL}/product/product`, {
         method: "POST",
         headers: {
@@ -47,26 +62,33 @@ export default function AddProductModal({ isOpen, onClose, product, onSave }) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || "Не удалось сохранить продукт");
+        throw new Error(
+          errorData.detail || 
+          "Сервер вернул ошибку. Попробуйте позже или обратитесь в поддержку."
+        );
       }
 
       const responseData = await response.json();
 
-      // Вызываем onSave с новым продуктом
       onSave({
         ...productData,
         id: responseData.id,
       });
 
-      // Закрываем модальное окно
       onClose();
     } catch (error) {
-      setError(error.message);
       console.error("Ошибка при сохранении продукта:", error);
+      setError(
+        error.message === "Failed to fetch"
+          ? "Не удалось соединиться с сервером. Проверьте интернет-соединение."
+          : error.message
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <motion.div
@@ -85,7 +107,11 @@ export default function AddProductModal({ isOpen, onClose, product, onSave }) {
       >
         <div className="personal-product-modal-header">
           <h2>{product ? "Редактировать продукт" : "Добавить продукт"}</h2>
-          <button onClick={onClose} className="personal-product-modal-close">
+          <button 
+            onClick={onClose} 
+            className="personal-product-modal-close"
+            disabled={loading}
+          >
             ✕
           </button>
         </div>
@@ -96,15 +122,15 @@ export default function AddProductModal({ isOpen, onClose, product, onSave }) {
           </div>
         )}
 
-        {loading && (
-          <div className="personal-product-modal-loading">
-            <LoadingSpinner />
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="personal-product-modal-body">
+          {loading && (
+            <div className="personal-product-modal-loading-overlay">
+              <LoadingSpinner />
+            </div>
+          )}
+
           <div className="personal-product-modal-form-group">
-            <label>Название</label>
+            <label>Название *</label>
             <input
               type="text"
               value={name}
@@ -113,56 +139,71 @@ export default function AddProductModal({ isOpen, onClose, product, onSave }) {
               disabled={loading}
             />
           </div>
-          <div className="personal-product-modal-form-group">
-            <label>Калории</label>
-            <input
-              type="number"
-              value={calories}
-              onChange={(e) => setCalories(e.target.value)}
-              required
-              disabled={loading}
-            />
+
+          <div className="nutrition-fields">
+            <div className="personal-product-modal-form-group">
+              <label>Калории (ккал) *</label>
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                value={calories}
+                onChange={(e) => setCalories(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+            <div className="personal-product-modal-form-group">
+              <label>Белки (г) *</label>
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                value={proteins}
+                onChange={(e) => setProteins(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+            <div className="personal-product-modal-form-group">
+              <label>Жиры (г) *</label>
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                value={fats}
+                onChange={(e) => setFats(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+            <div className="personal-product-modal-form-group">
+              <label>Углеводы (г) *</label>
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                value={carbohydrates}
+                onChange={(e) => setCarbohydrates(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
           </div>
+
           <div className="personal-product-modal-form-group">
-            <label>Белки</label>
+            <label>Вес (г) *</label>
             <input
               type="number"
-              value={proteins}
-              onChange={(e) => setProteins(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-          <div className="personal-product-modal-form-group">
-            <label>Жиры</label>
-            <input
-              type="number"
-              value={fats}
-              onChange={(e) => setFats(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-          <div className="personal-product-modal-form-group">
-            <label>Углеводы</label>
-            <input
-              type="number"
-              value={carbohydrates}
-              onChange={(e) => setCarbohydrates(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-          <div className="personal-product-modal-form-group">
-            <label>Вес (г)</label>
-            <input
-              type="number"
+              step="1"
+              min="1"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
               required
               disabled={loading}
             />
           </div>
+
           <div className="personal-product-modal-form-group">
             <label>Описание</label>
             <textarea
@@ -172,12 +213,22 @@ export default function AddProductModal({ isOpen, onClose, product, onSave }) {
               disabled={loading}
             />
           </div>
+
           <div className="personal-product-modal-footer">
-            <button type="button" onClick={onClose} disabled={loading}>
+            <button 
+              type="button" 
+              onClick={onClose} 
+              disabled={loading}
+              className="cancel-button"
+            >
               Отмена
             </button>
-            <button type="submit" disabled={loading}>
-              {loading ? "Сохранение..." : "Сохранить"}
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="submit-button"
+            >
+              {loading ? <LoadingSpinner small white /> : "Сохранить"}
             </button>
           </div>
         </form>
