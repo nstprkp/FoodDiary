@@ -10,6 +10,8 @@ import ErrorWithRetry from "../../components/Default/ErrorWithRetry";
 import LoadingSpinner from "../../components/Default/LoadingSpinner";
 import { checkAuth } from "../../utils/auth";
 import "./PersonalProducts.css";
+import { API_BASE_URL } from '../../config';
+
 
 export default function PersonalProducts() {
   const [products, setProducts] = useState([]);
@@ -46,7 +48,7 @@ export default function PersonalProducts() {
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch("http://localhost:8000/user/me", {
+      const response = await fetch(`${API_BASE_URL}/user/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -68,7 +70,7 @@ export default function PersonalProducts() {
   const fetchProfilePicture = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch("http://localhost:8000/user/profile-picture", {
+      const response = await fetch(`${API_BASE_URL}/user/profile-picture`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -86,7 +88,7 @@ export default function PersonalProducts() {
   const fetchProducts = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch("http://localhost:8000/product/my-products", {
+      const response = await fetch(`${API_BASE_URL}/product/my-products`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,7 +106,7 @@ export default function PersonalProducts() {
           if (product.has_picture) {
             try {
               const imageResponse = await fetch(
-                `http://localhost:8000/product/product-picture/${product.id}`,
+                `${API_BASE_URL}/product/product-picture/${product.id}`,
                 {
                   headers: { Authorization: `Bearer ${token}` },
                 }
@@ -149,7 +151,7 @@ export default function PersonalProducts() {
   const handleDelete = async (productId) => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch(`http://localhost:8000/product/delete/${productId}`, {
+      const response = await fetch(`${API_BASE_URL}/product/delete/${productId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -169,7 +171,7 @@ export default function PersonalProducts() {
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      await fetch("http://localhost:8000/auth/logout", {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });

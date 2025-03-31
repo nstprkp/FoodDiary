@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Upload } from "lucide-react";
 import ErrorHandler from "../Default/ErrorHandler";
 import LoadingSpinner from "../Default/LoadingSpinner";
+import { API_BASE_URL } from '../../config';
 import "./EditProductModal.css";
 
 export default function EditProductModal({ isOpen, onClose, product, onSave, onDelete }) {
@@ -76,7 +77,7 @@ export default function EditProductModal({ isOpen, onClose, product, onSave, onD
       setError(null);
 
       const token = localStorage.getItem("access_token");
-      const url = `http://localhost:8000/product/update/${product.id}`;
+      const url = `${API_BASE_URL}/product/update/${product.id}`;
       const method = "PUT";
 
       const response = await fetch(url, {

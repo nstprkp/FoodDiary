@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import ErrorHandler from "../Default/ErrorHandler";
 import LoadingSpinner from "../Default/LoadingSpinner";
+import { API_BASE_URL } from '../../config';
 import "./AddProductModal.css";
 
 export default function AddProductModal({ isOpen, onClose, product, onSave }) {
@@ -35,7 +36,7 @@ export default function AddProductModal({ isOpen, onClose, product, onSave }) {
       setError(null);
 
       const token = localStorage.getItem("access_token");
-      const response = await fetch("http://localhost:8000/product/product", {
+      const response = await fetch(`${API_BASE_URL}/product/product`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

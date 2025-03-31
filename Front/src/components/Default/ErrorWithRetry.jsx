@@ -1,6 +1,6 @@
 import React from "react";
 
-const ErrorWithRetry = ({ error, onRetry, onBack, retryText = "Попробовать снова", backText = "Назад" }) => {
+const ErrorWithRetry = ({ error, onRetry, onBack, retryText = "Попробовать снова", backText = "На главную" }) => {
   return (
     <div className="flex flex-col items-center justify-center h-screen profile-container">
       <p className="text-white text-lg">Произошла ошибка: {error}</p>

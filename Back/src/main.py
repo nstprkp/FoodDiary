@@ -18,6 +18,8 @@ from .logging_config import logger
 
 app = FastAPI(
     title="Food Diary",
+    version="0.1.2",
+    docs_url="/docs",
 )
 
 app.add_exception_handler(HTTPException, http_exception_handler)

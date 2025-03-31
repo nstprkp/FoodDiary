@@ -5,6 +5,8 @@ import "./Login.css";
 import { Link } from "react-router-dom";
 import ErrorHandler from "../../components/Default/ErrorHandler"; // Импортируем ErrorHandler
 import LoadingSpinner from "../../components/Default/LoadingSpinner"; // Импортируем LoadingSpinner
+import { API_BASE_URL } from '../../config';
+
 
 export default function Login() {
   const [login, setLogin] = useState("");
@@ -42,7 +44,7 @@ export default function Login() {
 
     try {
       setIsLoading(true); // Включаем загрузку
-      const response = await fetch("http://localhost:8000/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",

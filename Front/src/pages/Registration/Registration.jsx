@@ -5,6 +5,7 @@ import "./Registration.css";
 import { Link } from "react-router-dom"; // Импортируем Link для навигации
 import LoadingSpinner from "../../components/Default/LoadingSpinner"; // Импортируем LoadingSpinner
 import ErrorHandler from "../../components/Default/ErrorHandler"; // Импортируем ErrorHandler
+import { API_BASE_URL } from '../../config';
 
 export default function Registration() {
   const [username, setUsername] = useState("");
@@ -62,7 +63,7 @@ export default function Registration() {
 
     try {
       setIsLoading(true); // Включаем загрузку
-      const response = await fetch("http://localhost:8000/auth/registration", {
+      const response = await fetch(`${API_BASE_URL}/auth/registration`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

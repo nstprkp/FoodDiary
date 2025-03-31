@@ -9,6 +9,7 @@ import ErrorWithRetry from "../../components/Default/ErrorWithRetry"; // Имп�
 import { checkAuth } from "../../utils/auth";
 import LoadingSpinner from "../../components/Default/LoadingSpinner";
 import "./WeightStatistic.css";
+import { API_BASE_URL } from '../../config';
 import { Edit, Target, Ruler, Weight } from "lucide-react";
 
 export default function WeightStatistic() {
@@ -64,7 +65,7 @@ export default function WeightStatistic() {
         }
       });
   
-      const response = await fetch("http://localhost:8000/user/me", {
+      const response = await fetch(`${API_BASE_URL}/user/me`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -108,10 +109,10 @@ export default function WeightStatistic() {
       }
   
       const [userResponse, weightResponse] = await Promise.all([
-        fetch("http://localhost:8000/user/me", {
+        fetch(`${API_BASE_URL}/user/me`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("http://localhost:8000/user_weight/history/me", {
+        fetch(`${API_BASE_URL}/user_weight/history/me`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -148,7 +149,7 @@ export default function WeightStatistic() {
   const fetchProfilePicture = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch("http://localhost:8000/user/profile-picture", {
+      const response = await fetch(`${API_BASE_URL}/user/profile-picture`, {
         headers: { Authorization: `Bearer ${token}` },
       });
   

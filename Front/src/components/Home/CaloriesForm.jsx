@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import LoadingSpinner from "./LoadingSpinner"; // Импортируем компонент спиннера
 import ErrorHandler from "../Default/ErrorHandler"; // Импортируем компонент для обработки ошибок
+import { API_BASE_URL } from '../../config';
 import "./CaloriesForm.css";
 
 export default function CaloriesForm() {
@@ -37,7 +38,7 @@ export default function CaloriesForm() {
       setLoading(true); // Начинаем загрузку
       const token = localStorage.getItem("access_token");
 
-      const response = await fetch("http://localhost:8000/user/calculate_nutrients", {
+      const response = await fetch(`${API_BASE_URL}/user/calculate_nutrients`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

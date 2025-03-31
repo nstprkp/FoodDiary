@@ -7,6 +7,7 @@ import EditProfileModal from "../../components/Profile/EditProfileModal"
 import LoadingSpinner from "../../components/Default/LoadingSpinner"
 import ErrorHandler from "../../components/Default/ErrorHandler"
 import ErrorWithRetry from "../../components/Default/ErrorWithRetry"
+import { API_BASE_URL } from '../../config';
 import "./Profile.css"
 import {
   User,
@@ -48,7 +49,7 @@ export default function Profile() {
         return
       }
 
-      const response = await fetch("http://localhost:8000/user/me", {
+      const response = await fetch(`${API_BASE_URL}/user/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -93,7 +94,7 @@ export default function Profile() {
   const fetchProfilePicture = async () => {
     try {
       const token = localStorage.getItem("access_token")
-      const response = await fetch("http://localhost:8000/user/profile-picture", {
+      const response = await fetch(`${API_BASE_URL}/user/profile-picture`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -129,7 +130,7 @@ export default function Profile() {
       const formData = new FormData();
       formData.append("file", file);
   
-      const response = await fetch("http://localhost:8000/user/upload-profile-picture", {
+      const response = await fetch(`${API_BASE_URL}/user/upload-profile-picture`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -215,7 +216,7 @@ export default function Profile() {
         }
       })
 
-      const response = await fetch("http://localhost:8000/user/me", {
+      const response = await fetch(`${API_BASE_URL}/user/me`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -268,7 +269,7 @@ export default function Profile() {
       const token = localStorage.getItem("access_token")
 
       // Вызываем API для выхода
-      await fetch("http://localhost:8000/auth/logout", {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
